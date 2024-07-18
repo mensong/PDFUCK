@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="IMP">
+      <UniqueIdentifier>{7338f97b-5f11-4ea3-8ac6-a80f4e3b28f4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PDFuck.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_BITMAP_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_PAGEOBJECTMARK_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_PATHSEGMENT_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_FONT_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_FINDER_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_PAGELINK_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_TEXTPAGE_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_DOCUMENT_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_PAGE_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_PAGEOBJECT_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PDFuck.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_BITMAP_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_PAGEOBJECTMARK_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_PATHSEGMENT_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_FONT_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_FINDER_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_PAGELINK_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_TEXTPAGE_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_DOCUMENT_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_PAGE_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_PAGEOBJECT_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

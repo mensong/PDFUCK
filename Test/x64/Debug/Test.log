@@ -1,0 +1,5 @@
+﻿  Test.cpp
+D:\Working\PDFUCK\Test\Test.cpp(32,60): warning C4244: “参数”: 从“std::streamoff”转换到“uint32_t”，可能丢失数据
+D:\Working\PDFUCK\Test\Test.cpp(40,12): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+D:\Working\PDFUCK\Test\Test.cpp(50,12): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+  Test.vcxproj -> D:\Working\PDFUCK\x64\Debug\Test.exe

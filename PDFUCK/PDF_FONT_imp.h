@@ -19,4 +19,8 @@ public:
 	// 通过 PDF_FONT 继承
 	virtual float CalcCharWidth(wchar_t c, float fontSize) override;
 
+
+	// 通过 PDF_FONT 继承
+	virtual float CalcStringWidth(const wchar_t* str, float fontSize) override;
+
 };

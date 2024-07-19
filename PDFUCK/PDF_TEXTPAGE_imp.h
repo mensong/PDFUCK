@@ -61,11 +61,11 @@ public:
 
 	virtual int GetText(int start_index, int count, wchar_t* resultBuff) override;
 
-	virtual int CountRects(int start_index, int count) override;
+	virtual int CountRects(int start_index = 0, int count = 0) override;
 
 	virtual bool GetRect(int rect_index, double* left, double* top, double* right, double* bottom) override;
 
-	virtual int GetTextByBoundary(double left, double top, double right, double bottom, wchar_t* buffer, int buflen) override;
+	virtual int GetTextByRect(double left, double top, double right, double bottom, wchar_t* buffer, int buflen) override;
 
 	virtual PDF_FINDER* FindStart(wchar_t* findwhat, unsigned long flags, int start_index) override;
 

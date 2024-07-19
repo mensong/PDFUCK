@@ -35,7 +35,7 @@ public:
 	// Í¨¹ý PDF_PAGELINK ¼Ì³Ð
 	virtual int CountWebLinks() override;
 
-	virtual int GetURL(int link_index, unsigned short* buffer, int buflen) override;
+	virtual int GetURL(int link_index, wchar_t* buffer, int buflen) override;
 
 	virtual int CountRects(int link_index) override;
 

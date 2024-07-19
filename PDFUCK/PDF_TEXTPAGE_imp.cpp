@@ -96,8 +96,10 @@ int PDF_TEXTPAGE_imp::GetText(int start_index, int count, wchar_t* resultBuff)
 	return FPDFText_GetText(m_textPage, start_index, count, (unsigned short*)resultBuff);
 }
 
-int PDF_TEXTPAGE_imp::CountRects(int start_index, int count)
+int PDF_TEXTPAGE_imp::CountRects(int start_index/* = 0*/, int count/* = 0*/)
 {
+	if (count <= 0)
+		count = INT_MAX;
 	return FPDFText_CountRects(m_textPage, start_index, count);
 }
 
@@ -106,7 +108,7 @@ bool PDF_TEXTPAGE_imp::GetRect(int rect_index, double* left, double* top, double
 	return FPDFText_GetRect(m_textPage, rect_index, left, top, right, bottom);
 }
 
-int PDF_TEXTPAGE_imp::GetTextByBoundary(double left, double top, double right, double bottom, wchar_t* buffer, int buflen)
+int PDF_TEXTPAGE_imp::GetTextByRect(double left, double top, double right, double bottom, wchar_t* buffer, int buflen)
 {
 	return FPDFText_GetBoundedText(m_textPage, left, top, right, bottom, (unsigned short*)buffer, buflen);
 }

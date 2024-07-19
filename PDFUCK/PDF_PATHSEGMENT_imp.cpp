@@ -22,12 +22,12 @@ PDF_PATHSEGMENT_imp::~PDF_PATHSEGMENT_imp()
 // Í¨¹ý PDF_PATHSEGMENT ¼Ì³Ð
 bool PDF_PATHSEGMENT_imp::GetPoint(float* x, float* y)
 {
-	return false;
+	return FPDFPathSegment_GetPoint(m_segment, x, y);
 }
 
 PDF_PATHSEGMENT_imp::PDF_SEGMENT_TYPE PDF_PATHSEGMENT_imp::GetType()
 {
-	return PDF_SEGMENT_TYPE();
+	return (PDF_SEGMENT_TYPE)FPDFPathSegment_GetType(m_segment);
 }
 
 bool PDF_PATHSEGMENT_imp::GetIsClose()

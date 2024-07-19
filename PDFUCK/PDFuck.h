@@ -110,17 +110,17 @@ public:
 	virtual PDF_OBJECT_TYPE GetParamValueType(const char* key) = 0;
 	virtual bool GetParamIntValue(const char* key, int* out_value) = 0;
 	virtual bool GetParamStringValue(const char* key, 
-		void* buffer,
+		wchar_t* buffer,
 		unsigned long buflen,
 		unsigned long* out_buflen) = 0;
 	virtual bool GetParamBlobValue(const char* key, 
 		void* buffer,
 		unsigned long buflen,
 		unsigned long* out_buflen) = 0;
-	virtual bool SetIntParam(const char* key, int value) = 0;
-	virtual bool SetStringParam(const char* key, const char* out_value) = 0;
-	virtual bool SetBlobParam(const char* key, void* value, unsigned long value_len) = 0;
-	virtual bool RemoveParam(const char* key) = 0;
+	virtual bool SetIntParam(PDF_DOCUMENT* doc, PDF_PAGEOBJECT* pageObj, const char* key, int value) = 0;
+	virtual bool SetStringParam(PDF_DOCUMENT* doc, PDF_PAGEOBJECT* pageObj, const char* key, const char* value) = 0;
+	virtual bool SetBlobParam(PDF_DOCUMENT* doc, PDF_PAGEOBJECT* pageObj, const char* key, void* value, unsigned long value_len) = 0;
+	virtual bool RemoveParam(PDF_PAGEOBJECT* pageObj, const char* key) = 0;
 };
 
 class PDF_PATHSEGMENT
@@ -156,6 +156,7 @@ public:
 	}
 
 	virtual float CalcCharWidth(wchar_t c, float fontSize) = 0;
+	virtual float CalcStringWidth(const wchar_t* str, float fontSize) = 0;
 };
 
 class PDF_FINDER
@@ -172,55 +173,11 @@ class PDF_PAGELINK
 {
 public:
 	virtual int CountWebLinks() = 0;
-	virtual int GetURL(int link_index, unsigned short* buffer, int buflen) = 0;
+	virtual int GetURL(int link_index, wchar_t* buffer, int buflen) = 0;
 	virtual int CountRects(int link_index) = 0;
 	virtual bool GetRect(int link_index, int rect_index, double* left, double* top, double* right, double* bottom) = 0;
 	virtual bool GetTextRange(int link_index, int* start_char_index, int* char_count) = 0;
 
-};
-
-class PDF_TEXTPAGE
-{
-public:
-	virtual int CountChars() = 0;
-	virtual int GetCharIndexAtPos(double x, double y, double xTolerance, double yTolerance) = 0;
-	virtual wchar_t GetChar(int index) = 0;
-	virtual double GetCharFontSize(int index) = 0;
-	virtual unsigned long GetCharFontInfo(int index, char* bufferFontNameUtf8, unsigned long buflen, int* flags) = 0;
-	virtual int GetCharFontWeight(int index) = 0;
-	virtual PDF_TEXT_RENDERMODE GetCharTextRenderMode(int index) = 0;
-	virtual bool GetCharFillColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) = 0;
-	virtual bool GetCharStrokeColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) = 0;
-	virtual float GetCharAngle(int index) = 0;
-	virtual bool GetCharBox(int index, double* left, double* right, double* bottom, double* top) = 0;
-	virtual bool GetCharLooseCharBox(int index, float* left, float* right, float* bottom, float* top) = 0;
-	virtual bool GetCharMatrix(int index, 
-		float* a, float* b,
-		float* c, float* d,
-		float* e, float* f) = 0;
-	virtual bool GetCharOrigin(int index, double* x, double* y) = 0;
-
-	virtual int GetText(int start_index, int count, wchar_t* resultBuff) = 0;
-	virtual int CountRects(int start_index, int count) = 0;
-	virtual bool GetRect(int rect_index, double* left, double* top, double* right, double* bottom) = 0;
-	virtual int GetTextByBoundary(
-		double left, double top, double right, double bottom, 
-		wchar_t* buffer, int buflen) = 0;
-
-	enum FIND_FLAGS
-	{
-		// If not set, it will not match case by default.
-		PDF_MATCHCASE = 0x00000001,
-		// If not set, it will not match the whole word by default.
-		PDF_MATCHWHOLEWORD = 0x00000002,
-		// If not set, it will skip past the current match to look for the next match.
-		PDF_CONSECUTIVE = 0x00000004,
-	};
-	virtual PDF_FINDER* FindStart(wchar_t* findwhat, unsigned long/*FIND_FLAGS*/ flags, int start_index) = 0;
-	virtual void FindClose(PDF_FINDER** finder) = 0;
-
-	virtual PDF_PAGELINK* OpenWebLinks() = 0;
-	virtual void CloseWebLinks(PDF_PAGELINK** link_page) = 0;
 };
 
 class PDF_PAGEOBJECT
@@ -284,12 +241,12 @@ public:
 
 	virtual bool Image_SetBitmap(PDF_BITMAP* bitmap) = 0;
 	virtual PDF_BITMAP* Image_GetBitmap() = 0;
-	virtual PDF_BITMAP* Image_GetRenderedBitmap() = 0;
-	virtual unsigned long Image_GetImageDataDecoded(void* buffer,	unsigned long buflen) = 0;
-	virtual unsigned long Image_GetImageDataRaw(void* buffer, unsigned long buflen) = 0;
-	virtual int Image_GetImageFilterCount() = 0;
-	virtual unsigned long Image_GetImageFilter(int index, void* buffer, unsigned long buflen) = 0;
-	virtual bool Image_GetImageMetadata(PDF_PAGE* page,
+	virtual PDF_BITMAP* Image_GetRenderedBitmap(PDF_DOCUMENT* doc, PDF_PAGE* page) = 0;
+	virtual unsigned long Image_GetDataDecoded(void* buffer,	unsigned long buflen) = 0;
+	virtual unsigned long Image_GetDataRaw(void* buffer, unsigned long buflen) = 0;
+	virtual int Image_GetFilterCount() = 0;
+	virtual unsigned long Image_GetFilter(int index, void* buffer, unsigned long buflen) = 0;
+	virtual bool Image_GetMetadata(PDF_PAGE* page,
 		unsigned int* width,
 		unsigned int* height,
 		float* horizontal_dpi,
@@ -307,7 +264,8 @@ public:
 		double e, double f) = 0;
 
 	virtual int Path_CountSegments() = 0;
-	virtual PDF_PATHSEGMENT* Path_GetPathSegment(int index) = 0;
+	virtual PDF_PATHSEGMENT* Path_OpenSegment(int index) = 0;
+	virtual void Path_CloseSegment(PDF_PATHSEGMENT** segment) = 0;
 
 	virtual bool Path_MoveTo(float x, float y) = 0;
 	virtual bool Path_LineTo(float x, float y) = 0;
@@ -315,15 +273,16 @@ public:
 		float x1, float y1,
 		float x2, float y2,
 		float x3, float y3) = 0;
-	virtual bool Path_SetClose() = 0;
+	virtual bool Path_SetClosed() = 0;
+	virtual bool Path_IsClosed() = 0;
 	enum PDF_FILLMODE
 	{
 		PDF_FILLMODE_NONE = 0,
 		PDF_FILLMODE_ALTERNATE = 1,
 		PDF_FILLMODE_WINDING = 2,
 	};
-	virtual bool Path_SetDrawMode(PDF_FILLMODE fillmode, bool stroke) = 0;
-	virtual bool Path_GetDrawMode(PDF_FILLMODE* fillmode, bool* stroke) = 0;
+	virtual bool Path_SetDrawMode(PDF_FILLMODE fillmode, bool drawLine) = 0;
+	virtual bool Path_GetDrawMode(PDF_FILLMODE* fillmode, bool* drawLine) = 0;
 	virtual bool Path_GetMatrix(
 		float* a, float* b,
 		float* c, float* d,
@@ -333,29 +292,76 @@ public:
 		float c, float d,
 		float e, float f) = 0;
 
+	virtual unsigned long Text_GetText(PDF_TEXTPAGE* text_page, wchar_t* buffer, unsigned long length) = 0;
 	virtual bool Text_SetText(const wchar_t* text) = 0;
 	virtual bool Text_GetMatrix(
 		float* a, float* b,
 		float* c, float* d,
 		float* e, float* f) = 0;
 	virtual float Text_GetFontSize() = 0;
-	virtual PDF_TEXT_RENDERMODE Text_GetTextRenderMode() = 0;
-	virtual bool Text_SetTextRenderMode(PDF_TEXT_RENDERMODE render_mode) = 0;
+	virtual PDF_TEXT_RENDERMODE Text_GetRenderMode() = 0;
+	virtual bool Text_SetRenderMode(PDF_TEXT_RENDERMODE render_mode) = 0;
 	virtual unsigned long Text_GetFontName(void* bufferUtf8, unsigned long length) = 0;
-	virtual unsigned long Text_GetText(PDF_TEXTPAGE* text_page, wchar_t* buffer, unsigned long length) = 0;
 	virtual float Text_CalcCharWidth(PDF_FONT* font, wchar_t c) = 0;
 
 	virtual int Form_CountObjects() = 0;
-	virtual PDF_PAGEOBJECT* Form_GetObject(unsigned long index) = 0;
-	virtual bool Form_GetMatrix(
+	virtual PDF_PAGEOBJECT* Form_OpenObject(unsigned long index) = 0;
+	virtual bool FormObject_GetMatrix(//这里对应的是Form_OpenObject的返回值
 		float* a, float* b,
 		float* c, float* d,
 		float* e, float* f) = 0;
+	virtual void CloseFormObject(PDF_PAGEOBJECT** formObj) = 0;//这里对应的是Form_OpenObject的返回值
 
 	virtual int CountMarks() = 0;
-	virtual PDF_PAGEOBJECTMARK* GetMark(int index) = 0;
+	virtual PDF_PAGEOBJECTMARK* OpenMark(int index) = 0;
 	virtual PDF_PAGEOBJECTMARK* AddMark(const char* tag) = 0;
 	virtual bool RemoveMark(PDF_PAGEOBJECTMARK* mark) = 0;
+	virtual void CloseMark(PDF_PAGEOBJECTMARK** mark) = 0;
+};
+
+class PDF_TEXTPAGE
+{
+public:
+	virtual int CountChars() = 0;
+	virtual int GetCharIndexAtPos(double x, double y, double xTolerance, double yTolerance) = 0;
+	virtual wchar_t GetChar(int index) = 0;
+	virtual double GetCharFontSize(int index) = 0;
+	virtual unsigned long GetCharFontInfo(int index, char* bufferFontNameUtf8, unsigned long buflen, int* flags) = 0;
+	virtual int GetCharFontWeight(int index) = 0;
+	virtual PDF_TEXT_RENDERMODE GetCharTextRenderMode(int index) = 0;
+	virtual bool GetCharFillColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) = 0;
+	virtual bool GetCharStrokeColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) = 0;
+	virtual float GetCharAngle(int index) = 0;
+	virtual bool GetCharBox(int index, double* left, double* right, double* bottom, double* top) = 0;
+	virtual bool GetCharLooseCharBox(int index, float* left, float* right, float* bottom, float* top) = 0;
+	virtual bool GetCharMatrix(int index,
+		float* a, float* b,
+		float* c, float* d,
+		float* e, float* f) = 0;
+	virtual bool GetCharOrigin(int index, double* x, double* y) = 0;
+
+	virtual int GetText(int start_index, int count, wchar_t* resultBuff) = 0;
+
+	virtual int CountRects(int start_index = 0, int count = 0) = 0;
+	virtual bool GetRect(int rect_index, double* left, double* top, double* right, double* bottom) = 0;
+	virtual int GetTextByRect(
+		double left, double top, double right, double bottom,
+		wchar_t* buffer, int buflen) = 0;
+
+	enum FIND_FLAGS
+	{
+		// If not set, it will not match case by default.
+		PDF_MATCHCASE = 0x00000001,
+		// If not set, it will not match the whole word by default.
+		PDF_MATCHWHOLEWORD = 0x00000002,
+		// If not set, it will skip past the current match to look for the next match.
+		PDF_CONSECUTIVE = 0x00000004,
+	};
+	virtual PDF_FINDER* FindStart(wchar_t* findwhat, unsigned long/*FIND_FLAGS*/ flags, int start_index) = 0;
+	virtual void FindClose(PDF_FINDER** finder) = 0;
+
+	virtual PDF_PAGELINK* OpenWebLinks() = 0;
+	virtual void CloseWebLinks(PDF_PAGELINK** link_page) = 0;
 };
 
 class PDF_PAGE
@@ -471,6 +477,9 @@ public:
 	virtual PDF_FONT* LoadStandardFont(const char* fontWithoutSpaces) = 0;
 	virtual void CloseFont(PDF_FONT** font) = 0;
 
+	virtual PDF_BITMAP* NewBitmap(int width, int height, int alpha) = 0;
+	virtual void CloseBitmap(PDF_BITMAP** bitmap) = 0;
+
 	enum SAVE_FLAG
 	{
 		PDF_INCREMENTAL = 1,
@@ -478,6 +487,18 @@ public:
 		PDF_REMOVE_SECURITY = 3,
 	};
 	virtual bool SaveTo(const char* filePath, SAVE_FLAG flag) = 0;
+
+	//page_range - A page range string, Such as "1,3,5-7". If |pagerange| is NULL,
+	//  all pages from |src_doc| are imported.
+	virtual bool ImportPagesFrom(PDF_DOCUMENT* src_doc, const char* page_range, int insertAt) = 0;
+
+	virtual PDF_DOCUMENT* ExportNPagesToOne(
+		float output_width,
+		float output_height,
+		size_t num_pages_on_x_axis,
+		size_t num_pages_on_y_axis) = 0;
+
+	virtual bool CopyViewerPreferencesFrom(PDF_DOCUMENT* src_doc) = 0;
 };
 
 //每个dll内存实例只调用一次

@@ -4,6 +4,8 @@
 #include "PDF_PAGEOBJECT_imp.h"
 #include "PDF_PAGE_imp.h"
 #include "PDF_FONT_imp.h"
+#include "PDF_BITMAP_imp.h"
+#include <fpdf_ppo.h>
 
 bool PDF_DOCUMENT_imp::GetFileVersion(int* outVer)
 {
@@ -76,14 +78,24 @@ PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewPathPageObject(float x, float y)
 	auto o = FPDFPageObj_CreateNewPath(x, y);
 	if (!o)
 		return NULL;
-	return new PDF_PAGEOBJECT_imp(o);
+	auto ret = new PDF_PAGEOBJECT_imp(o);
+
+	//防止默认情况下不出来
+	ret->Path_SetDrawMode(PDF_PAGEOBJECT::PDF_FILLMODE_NONE, true);
+
+	return ret;
 }
 PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewRectPageObject(float x, float y, float w, float h)
 {
 	auto o = FPDFPageObj_CreateNewRect(x, y, w, h);
 	if (!o)
 		return NULL;
-	return new PDF_PAGEOBJECT_imp(o);
+	PDF_PAGEOBJECT_imp* ret = new PDF_PAGEOBJECT_imp(o);
+
+	//防止默认情况下不出来	
+	ret->Path_SetDrawMode(PDF_PAGEOBJECT::PDF_FILLMODE_ALTERNATE, false);
+
+	return ret;
 }
 PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewTextPageObject(const char* font_withoutspaces, float font_size)
 {
@@ -147,6 +159,39 @@ bool PDF_DOCUMENT_imp::SaveTo(const char* filePath, SAVE_FLAG flag)
 	bool res = FPDF_SaveAsCopy(m_doc, this, flag);
 	m_pdfFile.close();
 	return res;
+}
+
+PDF_BITMAP* PDF_DOCUMENT_imp::NewBitmap(int width, int height, int alpha)
+{
+	return new PDF_BITMAP_imp(width, height, alpha);
+}
+
+void PDF_DOCUMENT_imp::CloseBitmap(PDF_BITMAP** bitmap)
+{
+	auto o = IMP(PDF_BITMAP, bitmap);
+	delete o;
+	*bitmap = NULL;
+}
+
+bool PDF_DOCUMENT_imp::ImportPagesFrom(PDF_DOCUMENT* src_doc, const char* page_range, int insertAt)
+{
+	return FPDF_ImportPages(m_doc, IMP(PDF_DOCUMENT, src_doc)->m_doc, page_range, insertAt);
+}
+
+PDF_DOCUMENT* PDF_DOCUMENT_imp::ExportNPagesToOne(
+	float output_width, float output_height, 
+	size_t num_pages_on_x_axis, size_t num_pages_on_y_axis)
+{
+	auto doc = FPDF_ImportNPagesToOne(m_doc, output_width, output_height,
+		num_pages_on_x_axis, num_pages_on_y_axis);
+	if (!doc)
+		return NULL;
+	return new PDF_DOCUMENT_imp(doc);
+}
+
+bool PDF_DOCUMENT_imp::CopyViewerPreferencesFrom(PDF_DOCUMENT* src_doc)
+{
+	return FPDF_CopyViewerPreferences(m_doc, IMP(PDF_DOCUMENT, src_doc)->m_doc);
 }
 
 // 通过 PDF_DOCUMENT 继承

@@ -45,3 +45,17 @@ float PDF_FONT_imp::CalcCharWidth(wchar_t c, float fontSize)
 	return pCIDFont->GetVertWidth(cid) * _fontsize;
 }
 
+float PDF_FONT_imp::CalcStringWidth(const wchar_t* str, float fontSize)
+{
+	float strWidth = 0;
+	size_t strLen = wcslen(str);
+	for (size_t i = 0; i < strLen; i++)
+	{
+		float lc = CalcCharWidth(str[i], fontSize);
+		if (lc <= 0)
+			continue;
+		strWidth += lc;
+	}
+	return strWidth;
+}
+

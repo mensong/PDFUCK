@@ -3,20 +3,20 @@
 
 int PDF_FINDER_imp::GetCurrentResultCharIndex()
 {
-    return 0;
+    return FPDFText_GetSchResultIndex(m_finder);
 }
 
 int PDF_FINDER_imp::GetCurrentResultCharCount()
 {
-    return 0;
+    return FPDFText_GetSchCount(m_finder);
 }
 
 bool PDF_FINDER_imp::FindNext()
 {
-    return false;
+    return FPDFText_FindNext(m_finder);
 }
 
 bool PDF_FINDER_imp::FindPrev()
 {
-    return false;
+    return FPDFText_FindPrev(m_finder);
 }

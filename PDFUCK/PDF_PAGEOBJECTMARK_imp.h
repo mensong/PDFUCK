@@ -28,16 +28,16 @@ public:
 
 	virtual bool GetParamIntValue(const char* key, int* out_value) override;
 
-	virtual bool GetParamStringValue(const char* key, void* buffer, unsigned long buflen, unsigned long* out_buflen) override;
+	virtual bool GetParamStringValue(const char* key, wchar_t* buffer, unsigned long buflen, unsigned long* out_buflen) override;
 
 	virtual bool GetParamBlobValue(const char* key, void* buffer, unsigned long buflen, unsigned long* out_buflen) override;
 
-	virtual bool SetIntParam(const char* key, int value) override;
+	virtual bool SetIntParam(PDF_DOCUMENT* doc, PDF_PAGEOBJECT* pageObj, const char* key, int value) override;
 
-	virtual bool SetStringParam(const char* key, const char* out_value) override;
+	virtual bool SetStringParam(PDF_DOCUMENT* doc, PDF_PAGEOBJECT* pageObj, const char* key, const char* value) override;
 
-	virtual bool SetBlobParam(const char* key, void* value, unsigned long value_len) override;
+	virtual bool SetBlobParam(PDF_DOCUMENT* doc, PDF_PAGEOBJECT* pageObj, const char* key, void* value, unsigned long value_len) override;
 
-	virtual bool RemoveParam(const char* key) override;
+	virtual bool RemoveParam(PDF_PAGEOBJECT* pageObj, const char* key) override;
 
 };

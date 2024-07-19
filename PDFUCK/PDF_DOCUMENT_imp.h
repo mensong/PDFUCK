@@ -74,4 +74,20 @@ public:
 
 	virtual bool SaveTo(const char* filePath, SAVE_FLAG flag) override;
 
+
+	// 通过 PDF_DOCUMENT 继承
+	virtual PDF_BITMAP* NewBitmap(int width, int height, int alpha) override;
+
+
+	// 通过 PDF_DOCUMENT 继承
+	virtual void CloseBitmap(PDF_BITMAP** bitmap) override;
+
+
+	// 通过 PDF_DOCUMENT 继承
+	virtual bool ImportPagesFrom(PDF_DOCUMENT* src_doc, const char* page_range, int insertAt) override;
+
+	virtual PDF_DOCUMENT* ExportNPagesToOne(float output_width, float output_height, size_t num_pages_on_x_axis, size_t num_pages_on_y_axis) override;
+
+	virtual bool CopyViewerPreferencesFrom(PDF_DOCUMENT* src_doc) override;
+
 };

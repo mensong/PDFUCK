@@ -16,9 +16,16 @@ int PDF_PAGELINK_imp::CountRects(int link_index)
     return FPDFLink_CountRects(m_pageLink, link_index);
 }
 
-bool PDF_PAGELINK_imp::GetRect(int link_index, int rect_index, double* left, double* top, double* right, double* bottom)
+bool PDF_PAGELINK_imp::GetRect(int link_index, int rect_index, float* left, float* top, float* right, float* bottom)
 {
-    return FPDFLink_GetRect(m_pageLink, link_index, rect_index, left, top, right, bottom);
+    double _left, _top, _right, _bottom;
+    if (!FPDFLink_GetRect(m_pageLink, link_index, rect_index, &_left, &_top, &_right, &_bottom))
+        return false;
+    *left = _left;
+    *top = _top;
+	*right = _right;
+    *bottom = _bottom;
+    return true;
 }
 
 bool PDF_PAGELINK_imp::GetTextRange(int link_index, int* start_char_index, int* char_count)

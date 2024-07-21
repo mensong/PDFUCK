@@ -28,19 +28,19 @@ public:
 
 
 	// 通过 PDF_PAGE 继承
-	virtual double GetWidth() override;
+	virtual float GetWidth() override;
 
-	virtual double GetHeight() override;
+	virtual float GetHeight() override;
 
-	virtual int GetRotation() override;
+	virtual PAGE_RATEION GetRotation() override;
 
-	virtual void SetRotation(int rotate) override;
+	virtual void SetRotation(PAGE_RATEION rotate) override;
 
 	virtual bool HasTransparency() override;
 
 	virtual bool GetBoundingBox(float* left, float* top, float* right, float* bottom) override;
 
-	virtual void TransformAllAnnots(double a, double b, double c, double d, double e, double f) override;
+	virtual void TransformAllAnnots(float a, float b, float c, float d, float e, float f) override;
 
 	virtual void InsertPageObject(PDF_PAGEOBJECT* pageObj) override;
 
@@ -61,6 +61,12 @@ public:
 	virtual void RenderToDC(HDC dc, int start_x, int start_y, int size_x, int size_y, int rotate, int flags) override;
 
 	virtual void RenderToBitmap(PDF_BITMAP* bitmap, int start_x, int start_y, int size_x, int size_y, int rotate, int flags) override;
+
+
+	// 通过 PDF_PAGE 继承
+	virtual PDF_PAGEOBJECT_RTREE* NewRTree() override;
+
+	virtual void CloseRTree(PDF_PAGEOBJECT_RTREE** rt) override;
 
 };
 

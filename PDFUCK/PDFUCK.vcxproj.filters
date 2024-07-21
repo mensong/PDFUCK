@@ -60,6 +60,12 @@
     <ClInclude Include="PDF_PAGEOBJECT_imp.h">
       <Filter>IMP</Filter>
     </ClInclude>
+    <ClInclude Include="PDF_PAGEOBJECT_RTREE_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
+    <ClInclude Include="PDF_TEXTCHAR_RTREE_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -99,6 +105,12 @@
       <Filter>IMP</Filter>
     </ClCompile>
     <ClCompile Include="PDF_PAGEOBJECT_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_PAGEOBJECT_RTREE_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_TEXTCHAR_RTREE_imp.cpp">
       <Filter>IMP</Filter>
     </ClCompile>
   </ItemGroup>

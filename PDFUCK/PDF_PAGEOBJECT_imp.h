@@ -32,7 +32,7 @@ public:
 
 	virtual bool HasTransparency() override;
 
-	virtual void Transform(double a, double b, double c, double d, double e, double f) override;
+	virtual void Transform(float a, float b, float c, float d, float e, float f) override;
 
 	virtual bool GetBounds(float* left, float* bottom, float* right, float* top) override;
 
@@ -74,9 +74,9 @@ public:
 
 	virtual bool Image_GetMetadata(PDF_PAGE* page, unsigned int* width, unsigned int* height, float* horizontal_dpi, float* vertical_dpi, unsigned int* bits_per_pixel, PDF_COLORSPACE* colorspace, int* marked_content_id) override;
 
-	virtual bool Image_GetMatrix(double* a, double* b, double* c, double* d, double* e, double* f) override;
+	virtual bool Image_GetMatrix(float* a, float* b, float* c, float* d, float* e, float* f) override;
 
-	virtual bool Image_SetMatrix(double a, double b, double c, double d, double e, double f) override;
+	virtual bool Image_SetMatrix(float a, float b, float c, float d, float e, float f) override;
 
 	virtual int Path_CountSegments() override;
 
@@ -87,6 +87,8 @@ public:
 	virtual bool Path_LineTo(float x, float y) override;
 
 	virtual bool Path_BezierTo(float x1, float y1, float x2, float y2, float x3, float y3) override;
+
+	virtual bool Path_SplitBezierTo(float x, float y) override;
 
 	virtual bool Path_SetClosed() override;
 
@@ -108,7 +110,7 @@ public:
 
 	virtual bool Text_SetRenderMode(PDF_TEXT_RENDERMODE render_mode) override;
 
-	virtual unsigned long Text_GetFontName(void* bufferUtf8, unsigned long length) override;
+	virtual unsigned long Text_GetFontName(char* bufferUtf8, unsigned long length) override;
 
 	virtual unsigned long Text_GetText(PDF_TEXTPAGE* text_page, wchar_t* buffer, unsigned long length) override;
 
@@ -141,5 +143,9 @@ public:
 
 	// 通过 PDF_PAGEOBJECT 继承
 	virtual bool Path_IsClosed() override;
+
+
+	// 通过 PDF_PAGEOBJECT 继承
+	virtual PDF_PAGEOBJECT* Clone(PDF_DOCUMENT* doc, PDF_PAGE* page) override;
 
 };

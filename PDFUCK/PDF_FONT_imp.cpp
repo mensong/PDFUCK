@@ -59,3 +59,11 @@ float PDF_FONT_imp::CalcStringWidth(const wchar_t* str, float fontSize)
 	return strWidth;
 }
 
+int PDF_FONT_imp::GetFontName(char* buffer, int buffLen)
+{
+	CPDF_Font* pFont = CPDFFontFromFPDFFont(m_font);
+	ByteString sname = pFont->GetBaseFontName();
+	strcpy_s(buffer, buffLen, sname.c_str());
+	return sname.GetStringLength();
+}
+

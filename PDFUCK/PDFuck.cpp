@@ -6,7 +6,7 @@
 #include "PDF_DOCUMENT_imp.h"
 
 bool g_Initialized = false;
-PDF_API void GlobalInitializeLibrary(const char* fonts[])
+PDF_API void GlobalInitializeLibrary()
 {
 	FPDF_LIBRARY_CONFIG config;
 	config.m_pIsolate = NULL;

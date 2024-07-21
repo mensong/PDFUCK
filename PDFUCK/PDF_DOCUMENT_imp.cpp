@@ -6,6 +6,10 @@
 #include "PDF_FONT_imp.h"
 #include "PDF_BITMAP_imp.h"
 #include <fpdf_ppo.h>
+#include <page/cpdf_pathobject.h>
+#include <cpdfsdk_helpers.h>
+#include <font/cpdf_font.h>
+#include <page/cpdf_textobject.h>
 
 bool PDF_DOCUMENT_imp::GetFileVersion(int* outVer)
 {
@@ -53,7 +57,7 @@ void PDF_DOCUMENT_imp::ClosePage(PDF_PAGE** page)
 }
 
 // 通过 PDF_DOCUMENT 继承
-PDF_PAGE* PDF_DOCUMENT_imp::NewPage(int page_index, double width, double height)
+PDF_PAGE* PDF_DOCUMENT_imp::NewPage(int page_index, float width, float height)
 {
 	auto page = FPDFPage_New(m_doc, page_index, width, height);
 	if (!page)
@@ -64,7 +68,9 @@ PDF_PAGE* PDF_DOCUMENT_imp::NewPage(int page_index, double width, double height)
 // 通过 PDF_DOCUMENT 继承
 void PDF_DOCUMENT_imp::DeletePage(int pageIdx)
 {
+	FPDFPage_Delete(m_doc, pageIdx);
 }
+
 PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewImagePageObject()
 {
 	FPDF_PAGEOBJECT po = FPDFPageObj_NewImageObj(m_doc);
@@ -73,12 +79,18 @@ PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewImagePageObject()
 
 	return new PDF_PAGEOBJECT_imp(po);
 }
-PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewPathPageObject(float x, float y)
+PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewPathPageObject()
 {
-	auto o = FPDFPageObj_CreateNewPath(x, y);
-	if (!o)
-		return NULL;
+	auto pPathObj = std::make_unique<CPDF_PathObject>();
+	pPathObj->DefaultStates();
+	// Caller takes ownership.
+	auto o = FPDFPageObjectFromCPDFPageObject(pPathObj.release());
 	auto ret = new PDF_PAGEOBJECT_imp(o);
+
+	//auto o = FPDFPageObj_CreateNewPath(x, y);
+	//if (!o)
+	//	return NULL;
+	//auto ret = new PDF_PAGEOBJECT_imp(o);
 
 	//防止默认情况下不出来
 	ret->Path_SetDrawMode(PDF_PAGEOBJECT::PDF_FILLMODE_NONE, true);
@@ -97,11 +109,44 @@ PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewRectPageObject(float x, float y, float w, f
 
 	return ret;
 }
-PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewTextPageObject(const char* font_withoutspaces, float font_size)
+PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewTextPageObject(float font_size, const char* font_withoutspaces/* = NULL*/)
 {
-	FPDF_PAGEOBJECT o = FPDFPageObj_NewTextObj(m_doc, font_withoutspaces, font_size);
+#if 0
+	CPDF_Document* pDoc = CPDFDocumentFromFPDFDocument(m_doc);
+	if (!pDoc)
+		return NULL;
+
+	auto pTextObj = std::make_unique<CPDF_TextObject>();
+
+	RetainPtr<CPDF_Font> pFont = CPDF_Font::GetStockFont(pDoc, ByteStringView(font_withoutspaces));
+	if (pFont)
+		pTextObj->m_TextState.SetFont(pFont);
+	pTextObj->m_TextState.SetFontSize(font_size);
+	pTextObj->DefaultStates();
+
+	// Caller takes ownership.
+	FPDF_PAGEOBJECT o = FPDFPageObjectFromCPDFPageObject(pTextObj.release());
+
+#else
+
+	FPDF_PAGEOBJECT o = NULL;
+	if (font_withoutspaces && font_withoutspaces[0] != '\0')
+	{
+		o = FPDFPageObj_NewTextObj(m_doc, font_withoutspaces, font_size);
+	}
+	
+	if (!o)
+	{
+		auto font = const_cast<PDF_FONT*>(GetDefaultFont());
+		if (font)
+			o = FPDFPageObj_CreateTextObj(m_doc, IMP(PDF_FONT, font)->m_font, font_size);
+	}
+
+#endif
+
 	if (!o)
 		return NULL;
+	
 	return new PDF_PAGEOBJECT_imp(o);
 }
 PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewTextPageObject(PDF_FONT* font, float font_size)
@@ -113,7 +158,7 @@ PDF_PAGEOBJECT* PDF_DOCUMENT_imp::NewTextPageObject(PDF_FONT* font, float font_s
 	return new PDF_PAGEOBJECT_imp(o);
 }
 
-void PDF_DOCUMENT_imp::DestroyNotYetManagedPageObject(PDF_PAGEOBJECT* pageObj)
+void PDF_DOCUMENT_imp::DestroyUnmanagedPageObject(PDF_PAGEOBJECT* pageObj)
 {
 	PDF_PAGEOBJECT_imp* ipageObj = IMP(PDF_PAGEOBJECT, pageObj);
 	FPDFPageObj_Destroy(ipageObj->m_obj);
@@ -194,6 +239,49 @@ bool PDF_DOCUMENT_imp::CopyViewerPreferencesFrom(PDF_DOCUMENT* src_doc)
 	return FPDF_CopyViewerPreferences(m_doc, IMP(PDF_DOCUMENT, src_doc)->m_doc);
 }
 
+void PDF_DOCUMENT_imp::SetDefaultFontFilePath(const char* fontFilePath)
+{
+	m_defaultFontFilePath = fontFilePath;
+	if (m_defaultFont)
+	{
+		CloseFont(&m_defaultFont);
+		m_defaultFont = NULL;
+	}
+}
+
+const PDF_FONT* PDF_DOCUMENT_imp::GetDefaultFont()
+{
+	if (m_defaultFont)
+		return m_defaultFont;
+
+	if (m_defaultFontFilePath.empty())
+		return NULL;
+
+	std::ifstream fontFile(m_defaultFontFilePath, std::ios::out | std::ios::binary);
+	if (!fontFile.is_open())
+		return NULL;
+	
+	PDF_FONT::FONT_TYPE fontType = PDF_FONT::PDF_FONT_TYPE1;
+	size_t idxDot = m_defaultFontFilePath.find_last_of('.');
+	if (idxDot != std::string::npos)
+	{
+		std::string ext = m_defaultFontFilePath.substr(idxDot);
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+		if (ext == ".fon" || ext == ".ttf" || ext == ".ttc")
+			fontType = PDF_FONT::PDF_FONT_TRUETYPE;
+	}
+
+	fontFile.seekg(0, std::ios::end);
+	std::streampos fileSize = fontFile.tellg();
+	fontFile.seekg(0, std::ios::beg);
+	char* fontBuff = new char[fileSize];
+	fontFile.read(fontBuff, fileSize);
+	m_defaultFont = LoadFontFromMemory((uint8_t*)fontBuff, fileSize, fontType, true);
+	delete[] fontBuff;
+	
+	return m_defaultFont;
+}
+
 // 通过 PDF_DOCUMENT 继承
 void PDF_DOCUMENT_imp::ClosePageObject(PDF_PAGEOBJECT** pageObj)
 {
@@ -203,7 +291,12 @@ void PDF_DOCUMENT_imp::ClosePageObject(PDF_PAGEOBJECT** pageObj)
 }
 
 // 通过 PDF_DOCUMENT 继承
-bool PDF_DOCUMENT_imp::GetPageSizeByIndex(int page_index, double* width, double* height)
+bool PDF_DOCUMENT_imp::GetPageSizeByIndex(int page_index, float* width, float* height)
 {
-	return FPDF_GetPageSizeByIndex(m_doc, page_index, width, height);
+	double _width, _height;
+	if (!FPDF_GetPageSizeByIndex(m_doc, page_index, &_width, &_height))
+		return false;
+	*width = _width;
+	*height = _height;
+	return true;
 }

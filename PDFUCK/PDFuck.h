@@ -155,6 +155,8 @@ public:
 	{
 	}
 
+	virtual int GetFontName(char* buffer, int buffLen) = 0;
+
 	virtual float CalcCharWidth(wchar_t c, float fontSize) = 0;
 	virtual float CalcStringWidth(const wchar_t* str, float fontSize) = 0;
 };
@@ -175,7 +177,7 @@ public:
 	virtual int CountWebLinks() = 0;
 	virtual int GetURL(int link_index, wchar_t* buffer, int buflen) = 0;
 	virtual int CountRects(int link_index) = 0;
-	virtual bool GetRect(int link_index, int rect_index, double* left, double* top, double* right, double* bottom) = 0;
+	virtual bool GetRect(int link_index, int rect_index, float* left, float* top, float* right, float* bottom) = 0;
 	virtual bool GetTextRange(int link_index, int* start_char_index, int* char_count) = 0;
 
 };
@@ -183,12 +185,14 @@ public:
 class PDF_PAGEOBJECT
 {
 public:
+	virtual PDF_PAGEOBJECT* Clone(PDF_DOCUMENT* doc, PDF_PAGE* page) = 0;
+
 	virtual PDF_PAGE_OBJECT_TYPE GetType() = 0;
 	virtual bool HasTransparency() = 0;
 	virtual void Transform(
-		double a, double b,
-		double c, double d,
-		double e, double f) = 0;
+		float a, float b,
+		float c, float d,
+		float e, float f) = 0;
 
 	virtual bool GetBounds(float* left, float* bottom, float* right, float* top) = 0;
 
@@ -255,13 +259,13 @@ public:
 		PDF_COLORSPACE* colorspace,
 		int* marked_content_id) = 0;
 	virtual bool Image_GetMatrix(
-		double* a, double* b,
-		double* c, double* d,
-		double* e, double* f) = 0;
+		float* a, float* b,
+		float* c, float* d,
+		float* e, float* f) = 0;
 	virtual bool Image_SetMatrix(
-		double a, double b,
-		double c, double d,
-		double e, double f) = 0;
+		float a, float b,
+		float c, float d,
+		float e, float f) = 0;
 
 	virtual int Path_CountSegments() = 0;
 	virtual PDF_PATHSEGMENT* Path_OpenSegment(int index) = 0;
@@ -273,6 +277,7 @@ public:
 		float x1, float y1,
 		float x2, float y2,
 		float x3, float y3) = 0;
+	virtual bool Path_SplitBezierTo(float x, float y) = 0;
 	virtual bool Path_SetClosed() = 0;
 	virtual bool Path_IsClosed() = 0;
 	enum PDF_FILLMODE
@@ -301,7 +306,7 @@ public:
 	virtual float Text_GetFontSize() = 0;
 	virtual PDF_TEXT_RENDERMODE Text_GetRenderMode() = 0;
 	virtual bool Text_SetRenderMode(PDF_TEXT_RENDERMODE render_mode) = 0;
-	virtual unsigned long Text_GetFontName(void* bufferUtf8, unsigned long length) = 0;
+	virtual unsigned long Text_GetFontName(char* bufferUtf8, unsigned long length) = 0;
 	virtual float Text_CalcCharWidth(PDF_FONT* font, wchar_t c) = 0;
 
 	virtual int Form_CountObjects() = 0;
@@ -319,33 +324,50 @@ public:
 	virtual void CloseMark(PDF_PAGEOBJECTMARK** mark) = 0;
 };
 
+class PDF_PAGEOBJECT_RTREE
+{
+public:
+	virtual bool AppendPageObject(PDF_PAGEOBJECT* pageObject) = 0;
+	virtual int SearchPageObjectsByAABBBox(float minPos[2], float maxPos[2],
+		PDF_PAGEOBJECT** arrOutPageObjectBuffer, int bufferLen, float threshold = 0.01) = 0;
+};
+
+class PDF_TEXTCHAR_RTREE
+{
+public:
+	virtual bool AppendTextPageAllChars() = 0;
+	virtual bool AppendCharIndex(int charIndex) = 0;
+	virtual int SearchCharIndexByAABBBox(float minPos[2], float maxPos[2],
+		int* arrOutIndexBuffer, int bufferLen, float threshold = 0.01) = 0;
+};
+
 class PDF_TEXTPAGE
 {
 public:
 	virtual int CountChars() = 0;
-	virtual int GetCharIndexAtPos(double x, double y, double xTolerance, double yTolerance) = 0;
+	virtual int GetCharIndexAtPos(float x, float y, float xTolerance, float yTolerance) = 0;
 	virtual wchar_t GetChar(int index) = 0;
-	virtual double GetCharFontSize(int index) = 0;
+	virtual float GetCharFontSize(int index) = 0;
 	virtual unsigned long GetCharFontInfo(int index, char* bufferFontNameUtf8, unsigned long buflen, int* flags) = 0;
 	virtual int GetCharFontWeight(int index) = 0;
 	virtual PDF_TEXT_RENDERMODE GetCharTextRenderMode(int index) = 0;
 	virtual bool GetCharFillColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) = 0;
 	virtual bool GetCharStrokeColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) = 0;
 	virtual float GetCharAngle(int index) = 0;
-	virtual bool GetCharBox(int index, double* left, double* right, double* bottom, double* top) = 0;
+	virtual bool GetCharBox(int index, float* left, float* right, float* bottom, float* top) = 0;
 	virtual bool GetCharLooseCharBox(int index, float* left, float* right, float* bottom, float* top) = 0;
 	virtual bool GetCharMatrix(int index,
 		float* a, float* b,
 		float* c, float* d,
 		float* e, float* f) = 0;
-	virtual bool GetCharOrigin(int index, double* x, double* y) = 0;
+	virtual bool GetCharOrigin(int index, float* x, float* y) = 0;
 
 	virtual int GetText(int start_index, int count, wchar_t* resultBuff) = 0;
 
 	virtual int CountRects(int start_index = 0, int count = 0) = 0;
-	virtual bool GetRect(int rect_index, double* left, double* top, double* right, double* bottom) = 0;
+	virtual bool GetRect(int rect_index, float* left, float* top, float* right, float* bottom) = 0;
 	virtual int GetTextByRect(
-		double left, double top, double right, double bottom,
+		float left, float top, float right, float bottom,
 		wchar_t* buffer, int buflen) = 0;
 
 	enum FIND_FLAGS
@@ -362,23 +384,37 @@ public:
 
 	virtual PDF_PAGELINK* OpenWebLinks() = 0;
 	virtual void CloseWebLinks(PDF_PAGELINK** link_page) = 0;
+
+	virtual PDF_TEXTCHAR_RTREE* NewTextCharRTree() = 0;
+	virtual void CloseTextCharRTree(PDF_TEXTCHAR_RTREE** rt) = 0;
 };
 
 class PDF_PAGE
 {
 public:
-	virtual double GetWidth() = 0;
-	virtual double GetHeight() = 0;
-
-	virtual int GetRotation() = 0;
-	virtual void SetRotation(int rotate) = 0;
+	enum PAGE_RATEION
+	{
+		//   0 - No rotation.
+		PAGE_RATEION_0 = 0,
+		//   1 - Rotated 90 degrees clockwise.
+		PAGE_RATEION_90 = 1,
+		//   2 - Rotated 180 degrees clockwise.
+		PAGE_RATEION_180 = 2,
+		//   3 - Rotated 270 degrees clockwise.
+		PAGE_RATEION_270 = 3,
+	};
+	virtual PAGE_RATEION GetRotation() = 0;
+	virtual void SetRotation(PAGE_RATEION rotate) = 0;
 	virtual bool HasTransparency() = 0;
+
+	virtual float GetWidth() = 0;
+	virtual float GetHeight() = 0;
 	virtual bool GetBoundingBox(float* left, float* top, float* right, float* bottom) = 0;
 
 	virtual void TransformAllAnnots(
-		double a, double b,
-		double c, double d,
-		double e, double f) = 0;
+		float a, float b,
+		float c, float d,
+		float e, float f) = 0;
 
 	virtual void InsertPageObject(PDF_PAGEOBJECT* pageObj) = 0;
 	virtual bool RemovePageObject(PDF_PAGEOBJECT* pageObj) = 0;
@@ -390,6 +426,9 @@ public:
 	virtual void CloseTextPage(PDF_TEXTPAGE** text_page) = 0;
 
 	virtual bool CommitChange() = 0;
+
+	virtual PDF_PAGEOBJECT_RTREE* NewRTree() = 0;
+	virtual void CloseRTree(PDF_PAGEOBJECT_RTREE** rt) = 0;
 
 	enum RENDER_FLAGS
 	{
@@ -458,18 +497,18 @@ public:
 
 	virtual int CountPages() = 0;
 	virtual PDF_PAGE* OpenPage(int pageIdx) = 0;
-	virtual PDF_PAGE* NewPage(int page_index, double width, double height) = 0;
+	virtual PDF_PAGE* NewPage(int page_index, float width, float height) = 0;
 	virtual void ClosePage(PDF_PAGE** page) = 0;
 	virtual void DeletePage(int pageIdx) = 0;
 
-	virtual bool GetPageSizeByIndex(int page_index, double* width, double* height) = 0;
+	virtual bool GetPageSizeByIndex(int page_index, float* width, float* height) = 0;
 
 	virtual PDF_PAGEOBJECT* NewImagePageObject() = 0;
-	virtual PDF_PAGEOBJECT* NewPathPageObject(float x, float y) = 0;
+	virtual PDF_PAGEOBJECT* NewPathPageObject() = 0;
 	virtual PDF_PAGEOBJECT* NewRectPageObject(float x, float y, float w, float h) = 0;
-	virtual PDF_PAGEOBJECT* NewTextPageObject(const char* font_withoutspaces, float font_size) = 0;
+	virtual PDF_PAGEOBJECT* NewTextPageObject(float font_size, const char* font_withoutspaces = NULL) = 0;
 	virtual PDF_PAGEOBJECT* NewTextPageObject(PDF_FONT* font, float font_size) = 0;
-	virtual void DestroyNotYetManagedPageObject(PDF_PAGEOBJECT* pageObj) = 0;
+	virtual void DestroyUnmanagedPageObject(PDF_PAGEOBJECT* pageObj) = 0;
 	virtual void ClosePageObject(PDF_PAGEOBJECT** pageObj) = 0;
 
 	virtual PDF_FONT* LoadFontFromMemory(const uint8_t* data, uint32_t size, 
@@ -499,10 +538,13 @@ public:
 		size_t num_pages_on_y_axis) = 0;
 
 	virtual bool CopyViewerPreferencesFrom(PDF_DOCUMENT* src_doc) = 0;
+
+	virtual void SetDefaultFontFilePath(const char* fontFilePath) = 0;
+	virtual const PDF_FONT* GetDefaultFont() = 0;
 };
 
 //每个dll内存实例只调用一次
-PDF_API void GlobalInitializeLibrary(const char* fonts[]);
+PDF_API void GlobalInitializeLibrary();
 PDF_API void GlobalDestroyLibrary();
 
 PDF_API PDF_DOCUMENT* CreateDocument();

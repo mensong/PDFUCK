@@ -22,7 +22,7 @@ PDF_PAGE_OBJECT_TYPE PDF_PAGEOBJECT_imp::GetType()
 {
 	return (PDF_PAGE_OBJECT_TYPE)FPDFPageObj_GetType(m_obj);
 }
-void PDF_PAGEOBJECT_imp::Transform(double a, double b, double c, double d, double e, double f)
+void PDF_PAGEOBJECT_imp::Transform(float a, float b, float c, float d, float e, float f)
 {
 	FPDFPageObj_Transform(m_obj, a, b, c, d, e, f);
 }
@@ -66,11 +66,20 @@ float PDF_PAGEOBJECT_imp::Text_CalcCharWidth(PDF_FONT* font, wchar_t c)
 	return (ctextObj->GetCharWidth)(charCode);
 }
 
-bool PDF_PAGEOBJECT_imp::Image_GetMatrix(double* a, double* b, double* c, double* d, double* e, double* f)
+bool PDF_PAGEOBJECT_imp::Image_GetMatrix(float* a, float* b, float* c, float* d, float* e, float* f)
 {
-	return FPDFImageObj_GetMatrix(m_obj, a, b, c, d, e, f);
+	double _a, _b, _c, _d, _e, _f;
+	if (!FPDFImageObj_GetMatrix(m_obj, &_a, &_b, &_c, &_d, &_e, &_f))
+		return false;
+	*a = (float)_a;
+	*b = (float)_b;
+	*c = (float)_c;
+	*d = (float)_d;
+	*e = (float)_e;
+	*f = (float)_f;
+	return true;
 }
-bool PDF_PAGEOBJECT_imp::Image_SetMatrix(double a, double b, double c, double d, double e, double f)
+bool PDF_PAGEOBJECT_imp::Image_SetMatrix(float a, float b, float c, float d, float e, float f)
 {
 	return FPDFImageObj_SetMatrix(m_obj, a, b, c, d, e, f);
 }
@@ -131,6 +140,9 @@ PDF_PAGEOBJECT::PDF_LINEJOIN PDF_PAGEOBJECT_imp::GetLineJoin()
 }
 bool PDF_PAGEOBJECT_imp::SetLineJoin(PDF_LINEJOIN linejoin)
 {
+	if (linejoin == PDF_LINEJOIN::PDF_LINEJOIN_UNKNOW)
+		return false;
+
 	return FPDFPageObj_SetLineJoin(m_obj, linejoin);
 }
 PDF_PAGEOBJECT::PDF_LINECAP PDF_PAGEOBJECT_imp::GetLineCap()
@@ -229,6 +241,17 @@ bool PDF_PAGEOBJECT_imp::Path_BezierTo(float x1, float y1, float x2, float y2, f
 {
 	return FPDFPath_BezierTo(m_obj, x1, y1, x2, y2, x3, y3);
 }
+bool PDF_PAGEOBJECT_imp::Path_SplitBezierTo(float x, float y)
+{
+	auto* pPathObj = CPDFPathObjectFromFPDFPageObject(m_obj);
+	if (!pPathObj)
+		return false;
+
+	CPDF_Path& cpath = pPathObj->path();
+	cpath.AppendPoint(CFX_PointF(x, y), FXPT_TYPE::BezierTo);
+	pPathObj->SetDirty(true);
+	return true;
+}
 bool PDF_PAGEOBJECT_imp::Path_SetClosed()
 {
 	return FPDFPath_Close(m_obj);
@@ -239,7 +262,10 @@ bool PDF_PAGEOBJECT_imp::Path_SetDrawMode(PDF_FILLMODE fillmode, bool drawLine)
 }
 bool PDF_PAGEOBJECT_imp::Path_GetDrawMode(PDF_FILLMODE* fillmode, bool* drawLine)
 {
-	return FPDFPath_GetDrawMode(m_obj, (int*)fillmode, (FPDF_BOOL*)drawLine);
+	FPDF_BOOL _drawLine;
+	bool b = FPDFPath_GetDrawMode(m_obj, (int*)fillmode, &_drawLine);
+	*drawLine = _drawLine;
+	return b;
 }
 bool PDF_PAGEOBJECT_imp::Path_GetMatrix(float* a, float* b, float* c, float* d, float* e, float* f)
 {
@@ -268,6 +294,9 @@ bool PDF_PAGEOBJECT_imp::Path_SetMatrix(float a, float b, float c, float d, floa
 }
 bool PDF_PAGEOBJECT_imp::Text_SetText(const wchar_t* text)
 {
+	if (!text || text[0] == '\0')
+		return FPDFText_SetText(m_obj, (FPDF_WIDESTRING)L" ");//·ÀÖ¹±ÀÀ£
+	
 	return FPDFText_SetText(m_obj, (FPDF_WIDESTRING)text);
 }
 bool PDF_PAGEOBJECT_imp::Text_GetMatrix(float* a, float* b, float* c, float* d, float* e, float* f)
@@ -294,9 +323,11 @@ PDF_TEXT_RENDERMODE PDF_PAGEOBJECT_imp::Text_GetRenderMode()
 }
 bool PDF_PAGEOBJECT_imp::Text_SetRenderMode(PDF_TEXT_RENDERMODE render_mode)
 {
+	if (render_mode == PDF_TEXT_RENDERMODE::PDF_TEXTRENDERMODE_UNKNOWN)
+		return false;
 	return FPDFTextObj_SetTextRenderMode(m_obj, (FPDF_TEXT_RENDERMODE)render_mode);
 }
-unsigned long PDF_PAGEOBJECT_imp::Text_GetFontName(void* bufferUtf8, unsigned long length)
+unsigned long PDF_PAGEOBJECT_imp::Text_GetFontName(char* bufferUtf8, unsigned long length)
 {
 	return FPDFTextObj_GetFontName(m_obj, bufferUtf8, length);
 }
@@ -356,5 +387,127 @@ bool PDF_PAGEOBJECT_imp::Path_IsClosed()
 		return false;
 
 	return cpath.GetPoints().back().m_CloseFigure;
+}
+
+PDF_PAGEOBJECT* PDF_PAGEOBJECT_imp::Clone(PDF_DOCUMENT* doc, PDF_PAGE* page)
+{
+	PDF_PAGEOBJECT* newPageObj = NULL;
+
+	auto funcFillCommon = [&]() 
+	{
+		unsigned int R, G, B, A;
+		if (this->GetFillColor(&R, &G, &B, &A))
+			newPageObj->SetFillColor(R, G, B, A);
+
+		newPageObj->SetLineCap(this->GetLineCap());
+
+		newPageObj->SetLineJoin(this->GetLineJoin());
+
+		if (this->GetStrokeColor(&R, &G, &B, &A))
+			newPageObj->SetStrokeColor(R, G, B, A);
+
+		float strokeWidth = 1;
+		if (this->GetStrokeWidth(&strokeWidth))
+			newPageObj->SetStrokeWidth(strokeWidth);
+	};
+
+	auto t = GetType();
+	switch (t)
+	{
+	case PDF_PAGEOBJ_TEXT:
+	{
+		float fontSize = this->Text_GetFontSize();
+		char fontName[255] = { 0 };
+		this->Text_GetFontName(fontName, 254);
+		newPageObj = doc->NewTextPageObject(fontSize, fontName);		
+		if (newPageObj)
+		{
+			funcFillCommon();
+
+			newPageObj->Text_SetRenderMode(this->Text_GetRenderMode());
+
+			PDF_TEXTPAGE* textPage = page->OpenTextPage();
+			if (textPage)
+			{
+				wchar_t text[512] = { 0 };
+				auto len = this->Text_GetText(textPage, text, 512);
+				newPageObj->Text_SetText(text);
+				page->CloseTextPage(&textPage);
+			}
+		}		
+	}
+		break;
+	case PDF_PAGEOBJ_PATH:
+	{
+		newPageObj = doc->NewPathPageObject();
+		if (newPageObj)
+		{
+			funcFillCommon();
+
+			int countSegs = this->Path_CountSegments();
+			for (int i = 0; i < countSegs; i++)
+			{
+				auto seg = this->Path_OpenSegment(i);
+				auto segType = seg->GetType();
+				float x, y;
+				if (seg->GetPoint(&x, &y))
+				{
+					switch (segType)
+					{
+					case PDF_PATHSEGMENT::PDF_SEGMENT_LINETO:
+						newPageObj->Path_LineTo(x, y);
+						break;
+					case PDF_PATHSEGMENT::PDF_SEGMENT_BEZIERTO:
+						newPageObj->Path_SplitBezierTo(x, y);
+						break;
+					case PDF_PATHSEGMENT::PDF_SEGMENT_MOVETO:
+						newPageObj->Path_MoveTo(x, y);
+						break;
+					default:
+						break;
+					}
+				}
+				this->Path_CloseSegment(&seg);
+			}
+
+			PDF_FILLMODE fillmode;
+			bool drawLine;
+			if (this->Path_GetDrawMode(&fillmode, &drawLine))
+				newPageObj->Path_SetDrawMode(fillmode, drawLine);
+
+			if (this->Path_IsClosed())
+				newPageObj->Path_SetClosed();
+		}
+	}
+		break;
+	case PDF_PAGEOBJ_IMAGE:
+	{
+		newPageObj = doc->NewImagePageObject();
+		if (newPageObj)
+		{
+			funcFillCommon();
+
+			auto bitmap = this->Image_GetBitmap();
+			if (bitmap)
+				newPageObj->Image_SetBitmap(bitmap);
+		}
+	}
+		break;
+	case PDF_PAGEOBJ_SHADING:
+	{
+
+	}
+		break;
+	case PDF_PAGEOBJ_FORM:
+	{
+		
+	}
+		break;
+	default:
+		return NULL;
+		break;
+	}
+	
+	return newPageObj;
 }
 

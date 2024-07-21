@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PDFUCK", "PDFUCK\PDFUCK.vcxproj", "{9484EEB4-F04B-4351-9667-3EF042EAE804}"
-	ProjectSection(ProjectDependencies) = postProject
-		{872892EF-314E-48AA-8483-AED78E9070EF} = {872892EF-314E-48AA-8483-AED78E9070EF}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pdfium_lib", "vs_pdfium\pdfium_lib\pdfium_lib.vcxproj", "{872892EF-314E-48AA-8483-AED78E9070EF}"
 EndProject

@@ -33,11 +33,11 @@ public:
 	// 通过 PDF_TEXTPAGE 继承
 	virtual int CountChars() override;
 
-	virtual int GetCharIndexAtPos(double x, double y, double xTolerance, double yTolerance) override;
+	virtual int GetCharIndexAtPos(float x, float y, float xTolerance, float yTolerance) override;
 
 	virtual wchar_t GetChar(int index) override;
 
-	virtual double GetCharFontSize(int index) override;
+	virtual float GetCharFontSize(int index) override;
 
 	virtual unsigned long GetCharFontInfo(int index, char* bufferFontNameUtf8, unsigned long buflen, int* flags) override;
 
@@ -51,21 +51,21 @@ public:
 
 	virtual float GetCharAngle(int index) override;
 
-	virtual bool GetCharBox(int index, double* left, double* right, double* bottom, double* top) override;
+	virtual bool GetCharBox(int index, float* left, float* right, float* bottom, float* top) override;
 
 	virtual bool GetCharLooseCharBox(int index, float* left, float* right, float* bottom, float* top) override;
 
 	virtual bool GetCharMatrix(int index, float* a, float* b, float* c, float* d, float* e, float* f) override;
 
-	virtual bool GetCharOrigin(int index, double* x, double* y) override;
+	virtual bool GetCharOrigin(int index, float* x, float* y) override;
 
 	virtual int GetText(int start_index, int count, wchar_t* resultBuff) override;
 
 	virtual int CountRects(int start_index = 0, int count = 0) override;
 
-	virtual bool GetRect(int rect_index, double* left, double* top, double* right, double* bottom) override;
+	virtual bool GetRect(int rect_index, float* left, float* top, float* right, float* bottom) override;
 
-	virtual int GetTextByRect(double left, double top, double right, double bottom, wchar_t* buffer, int buflen) override;
+	virtual int GetTextByRect(float left, float top, float right, float bottom, wchar_t* buffer, int buflen) override;
 
 	virtual PDF_FINDER* FindStart(wchar_t* findwhat, unsigned long flags, int start_index) override;
 
@@ -74,6 +74,12 @@ public:
 	virtual PDF_PAGELINK* OpenWebLinks() override;
 
 	virtual void CloseWebLinks(PDF_PAGELINK** link_page) override;
+
+
+	// 通过 PDF_TEXTPAGE 继承
+	virtual PDF_TEXTCHAR_RTREE* NewTextCharRTree() override;
+
+	virtual void CloseTextCharRTree(PDF_TEXTCHAR_RTREE** rt) override;
 
 };
 

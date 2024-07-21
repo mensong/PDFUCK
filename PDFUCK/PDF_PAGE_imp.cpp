@@ -3,19 +3,34 @@
 #include "PDF_BITMAP_imp.h"
 #include "PDF_PAGEOBJECT_imp.h"
 #include "PDF_TEXTPAGE_imp.h"
+#include "PDF_PAGEOBJECT_RTREE_imp.h"
 #include <fpdf_edit.h>
 
 
 // 通过 PDF_PAGE 继承
-double PDF_PAGE_imp::GetWidth()
+float PDF_PAGE_imp::GetWidth()
 {
+	PAGE_RATEION rotate = GetRotation();
+	if (rotate == PAGE_RATEION::PAGE_RATEION_90 ||
+		rotate == PAGE_RATEION::PAGE_RATEION_270)
+	{
+		return FPDF_GetPageHeight(m_page);
+	}
+
 	return FPDF_GetPageWidth(m_page);
 }
 
 
 // 通过 PDF_PAGE 继承
-double PDF_PAGE_imp::GetHeight()
+float PDF_PAGE_imp::GetHeight()
 {
+	int rotate = GetRotation();
+	if (rotate == PAGE_RATEION::PAGE_RATEION_90 ||
+		rotate == PAGE_RATEION::PAGE_RATEION_270)
+	{
+		return FPDF_GetPageWidth(m_page);
+	}
+
 	return FPDF_GetPageHeight(m_page);
 }
 
@@ -34,15 +49,26 @@ void PDF_PAGE_imp::RenderToBitmap(PDF_BITMAP* bitmap,
 	FPDF_RenderPageBitmap(bp->m_bitmap, m_page, start_x, start_y, size_x, size_y, rotate, flags);
 }
 
-// 通过 PDF_PAGE 继承
-int PDF_PAGE_imp::GetRotation()
+PDF_PAGEOBJECT_RTREE* PDF_PAGE_imp::NewRTree()
 {
-	return FPDFPage_GetRotation(m_page);
+	return new PDF_PAGEOBJECT_RTREE_imp();
 }
 
-void PDF_PAGE_imp::SetRotation(int rotate)
+void PDF_PAGE_imp::CloseRTree(PDF_PAGEOBJECT_RTREE** rt)
 {
-	FPDFPage_SetRotation(m_page, rotate);
+	delete IMP(PDF_PAGEOBJECT_RTREE, *rt);
+	*rt = NULL;
+}
+
+// 通过 PDF_PAGE 继承
+PDF_PAGE::PAGE_RATEION PDF_PAGE_imp::GetRotation()
+{
+	return (PAGE_RATEION)FPDFPage_GetRotation(m_page);
+}
+
+void PDF_PAGE_imp::SetRotation(PAGE_RATEION rotate)
+{
+	FPDFPage_SetRotation(m_page, (int)rotate);
 }
 
 bool PDF_PAGE_imp::HasTransparency()
@@ -50,7 +76,7 @@ bool PDF_PAGE_imp::HasTransparency()
 	return FPDFPage_HasTransparency(m_page);
 }
 
-void PDF_PAGE_imp::TransformAllAnnots(double a, double b, double c, double d, double e, double f)
+void PDF_PAGE_imp::TransformAllAnnots(float a, float b, float c, float d, float e, float f)
 {
 	FPDFPage_TransformAnnots(m_page, a, b, c, d, e, f);
 }

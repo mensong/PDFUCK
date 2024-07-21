@@ -4,6 +4,8 @@
 #include <fpdf_save.h>
 #include <fstream>
 
+class PDF_FONT;
+
 class PDF_DOCUMENT_imp
 	: public PDF_DOCUMENT
 	, public FPDF_FILEWRITE
@@ -12,21 +14,29 @@ public:
 	FPDF_DOCUMENT m_doc;
 
 	std::ofstream m_pdfFile;
+	std::string m_defaultFontFilePath;
+	PDF_FONT* m_defaultFont;
 
 public:
 	PDF_DOCUMENT_imp()
 		: m_doc(NULL)
+		, m_defaultFont(NULL)
 	{
 
 	}
 	PDF_DOCUMENT_imp(FPDF_DOCUMENT doc)
 		: m_doc(doc)
+		, m_defaultFont(NULL)
 	{
 
 	}
 	~PDF_DOCUMENT_imp()
 	{
-
+		if (m_defaultFont)
+		{
+			CloseFont(&m_defaultFont);
+			m_defaultFont = NULL;
+		}
 	}
 
 	
@@ -44,25 +54,25 @@ public:
 
 	virtual PDF_PAGE* OpenPage(int pageIdx) override;
 
-	virtual PDF_PAGE* NewPage(int page_index, double width, double height) override;
+	virtual PDF_PAGE* NewPage(int page_index, float width, float height) override;
 
 	virtual void ClosePage(PDF_PAGE** page) override;
 
 	virtual void DeletePage(int pageIdx) override;
 
-	virtual bool GetPageSizeByIndex(int page_index, double* width, double* height) override;
+	virtual bool GetPageSizeByIndex(int page_index, float* width, float* height) override;
 
 	virtual PDF_PAGEOBJECT* NewImagePageObject() override;
 
-	virtual PDF_PAGEOBJECT* NewPathPageObject(float x, float y) override;
+	virtual PDF_PAGEOBJECT* NewPathPageObject() override;
 
 	virtual PDF_PAGEOBJECT* NewRectPageObject(float x, float y, float w, float h) override;
 
-	virtual PDF_PAGEOBJECT* NewTextPageObject(const char* font_withoutspaces, float font_size) override;
+	virtual PDF_PAGEOBJECT* NewTextPageObject(float font_size, const char* font_withoutspaces = NULL) override;
 
 	virtual PDF_PAGEOBJECT* NewTextPageObject(PDF_FONT* font, float font_size) override;
 
-	virtual void DestroyNotYetManagedPageObject(PDF_PAGEOBJECT* pageObj) override;
+	virtual void DestroyUnmanagedPageObject(PDF_PAGEOBJECT* pageObj) override;
 
 	virtual void ClosePageObject(PDF_PAGEOBJECT** pageObj) override;
 
@@ -89,5 +99,10 @@ public:
 	virtual PDF_DOCUMENT* ExportNPagesToOne(float output_width, float output_height, size_t num_pages_on_x_axis, size_t num_pages_on_y_axis) override;
 
 	virtual bool CopyViewerPreferencesFrom(PDF_DOCUMENT* src_doc) override;
+
+
+	// Í¨¹ý PDF_DOCUMENT ¼Ì³Ð
+	virtual void SetDefaultFontFilePath(const char* fontFilePath) override;
+	virtual const PDF_FONT* GetDefaultFont() override;
 
 };

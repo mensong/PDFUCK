@@ -174,8 +174,10 @@
     <ClInclude Include="PDF_PAGELINK_imp.h" />
     <ClInclude Include="PDF_PAGEOBJECTMARK_imp.h" />
     <ClInclude Include="PDF_PAGEOBJECT_imp.h" />
+    <ClInclude Include="PDF_PAGEOBJECT_RTREE_imp.h" />
     <ClInclude Include="PDF_PAGE_imp.h" />
     <ClInclude Include="PDF_PATHSEGMENT_imp.h" />
+    <ClInclude Include="PDF_TEXTCHAR_RTREE_imp.h" />
     <ClInclude Include="PDF_TEXTPAGE_imp.h" />
   </ItemGroup>
   <ItemGroup>
@@ -194,8 +196,10 @@
     <ClCompile Include="PDF_PAGELINK_imp.cpp" />
     <ClCompile Include="PDF_PAGEOBJECTMARK_imp.cpp" />
     <ClCompile Include="PDF_PAGEOBJECT_imp.cpp" />
+    <ClCompile Include="PDF_PAGEOBJECT_RTREE_imp.cpp" />
     <ClCompile Include="PDF_PAGE_imp.cpp" />
     <ClCompile Include="PDF_PATHSEGMENT_imp.cpp" />
+    <ClCompile Include="PDF_TEXTCHAR_RTREE_imp.cpp" />
     <ClCompile Include="PDF_TEXTPAGE_imp.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

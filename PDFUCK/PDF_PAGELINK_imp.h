@@ -39,7 +39,7 @@ public:
 
 	virtual int CountRects(int link_index) override;
 
-	virtual bool GetRect(int link_index, int rect_index, double* left, double* top, double* right, double* bottom) override;
+	virtual bool GetRect(int link_index, int rect_index, float* left, float* top, float* right, float* bottom) override;
 
 	virtual bool GetTextRange(int link_index, int* start_char_index, int* char_count) override;
 

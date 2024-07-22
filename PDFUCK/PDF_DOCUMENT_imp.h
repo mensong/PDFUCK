@@ -105,4 +105,8 @@ public:
 	virtual void SetDefaultFontFilePath(const char* fontFilePath) override;
 	virtual const PDF_FONT* GetDefaultFont() override;
 
+
+	// Í¨¹ý PDF_DOCUMENT ¼Ì³Ð
+	virtual PDF_FONT* LoadFontFromFile(const char* fontFilePath, PDF_FONT::FONT_TYPE font_type, bool cid) override;
+
 };

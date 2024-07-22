@@ -513,6 +513,8 @@ public:
 
 	virtual PDF_FONT* LoadFontFromMemory(const uint8_t* data, uint32_t size, 
 		PDF_FONT::FONT_TYPE font_type, bool cid) = 0;
+	virtual PDF_FONT* LoadFontFromFile(const char* fontFilePath,
+		PDF_FONT::FONT_TYPE font_type, bool cid) = 0;
 	virtual PDF_FONT* LoadStandardFont(const char* fontWithoutSpaces) = 0;
 	virtual void CloseFont(PDF_FONT** font) = 0;
 

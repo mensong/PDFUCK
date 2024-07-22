@@ -256,10 +256,6 @@ const PDF_FONT* PDF_DOCUMENT_imp::GetDefaultFont()
 
 	if (m_defaultFontFilePath.empty())
 		return NULL;
-
-	std::ifstream fontFile(m_defaultFontFilePath, std::ios::out | std::ios::binary);
-	if (!fontFile.is_open())
-		return NULL;
 	
 	PDF_FONT::FONT_TYPE fontType = PDF_FONT::PDF_FONT_TYPE1;
 	size_t idxDot = m_defaultFontFilePath.find_last_of('.');
@@ -271,15 +267,32 @@ const PDF_FONT* PDF_DOCUMENT_imp::GetDefaultFont()
 			fontType = PDF_FONT::PDF_FONT_TRUETYPE;
 	}
 
+	m_defaultFont = LoadFontFromFile(m_defaultFontFilePath.c_str(), fontType, true);
+	
+	return m_defaultFont;
+}
+
+PDF_FONT* PDF_DOCUMENT_imp::LoadFontFromFile(const char* fontFilePath, PDF_FONT::FONT_TYPE font_type, bool cid)
+{
+	std::ifstream fontFile(fontFilePath, std::ios::out | std::ios::binary);
+	if (!fontFile.is_open())
+		return NULL;
+
 	fontFile.seekg(0, std::ios::end);
 	std::streampos fileSize = fontFile.tellg();
+	if (fileSize == 0)
+	{
+		fontFile.close();
+		return NULL;
+	}
 	fontFile.seekg(0, std::ios::beg);
 	char* fontBuff = new char[fileSize];
 	fontFile.read(fontBuff, fileSize);
-	m_defaultFont = LoadFontFromMemory((uint8_t*)fontBuff, fileSize, fontType, true);
-	delete[] fontBuff;
-	
-	return m_defaultFont;
+	fontFile.close();
+	PDF_FONT* font = LoadFontFromMemory((uint8_t*)fontBuff, fileSize, font_type, cid);
+	delete[] fontBuff;	
+
+	return font;
 }
 
 // Í¨¹ý PDF_DOCUMENT ¼Ì³Ð

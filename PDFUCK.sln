@@ -12,6 +12,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj",
 		{9484EEB4-F04B-4351-9667-3EF042EAE804} = {9484EEB4-F04B-4351-9667-3EF042EAE804}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComparePdf", "ComparePdf\ComparePdf.vcxproj", "{A0013780-4338-4D3C-963A-9F8BDCDAD497}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -44,6 +46,14 @@ Global
 		{4AEB9667-CA99-4C5F-8F09-A6ADD9A3D3DC}.Release|x64.Build.0 = Release|x64
 		{4AEB9667-CA99-4C5F-8F09-A6ADD9A3D3DC}.Release|x86.ActiveCfg = Release|Win32
 		{4AEB9667-CA99-4C5F-8F09-A6ADD9A3D3DC}.Release|x86.Build.0 = Release|Win32
+		{A0013780-4338-4D3C-963A-9F8BDCDAD497}.Debug|x64.ActiveCfg = Debug|x64
+		{A0013780-4338-4D3C-963A-9F8BDCDAD497}.Debug|x64.Build.0 = Debug|x64
+		{A0013780-4338-4D3C-963A-9F8BDCDAD497}.Debug|x86.ActiveCfg = Debug|Win32
+		{A0013780-4338-4D3C-963A-9F8BDCDAD497}.Debug|x86.Build.0 = Debug|Win32
+		{A0013780-4338-4D3C-963A-9F8BDCDAD497}.Release|x64.ActiveCfg = Release|x64
+		{A0013780-4338-4D3C-963A-9F8BDCDAD497}.Release|x64.Build.0 = Release|x64
+		{A0013780-4338-4D3C-963A-9F8BDCDAD497}.Release|x86.ActiveCfg = Release|Win32
+		{A0013780-4338-4D3C-963A-9F8BDCDAD497}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

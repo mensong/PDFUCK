@@ -86,7 +86,7 @@ public:
 
 
 	// 通过 PDF_DOCUMENT 继承
-	virtual PDF_BITMAP* NewBitmap(int width, int height, int alpha) override;
+	virtual PDF_BITMAP* NewBitmap(int width, int height, bool alpha) override;
 
 
 	// 通过 PDF_DOCUMENT 继承

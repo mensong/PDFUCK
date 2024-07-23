@@ -179,6 +179,7 @@
     <ClInclude Include="PDF_PATHSEGMENT_imp.h" />
     <ClInclude Include="PDF_TEXTCHAR_RTREE_imp.h" />
     <ClInclude Include="PDF_TEXTPAGE_imp.h" />
+    <ClInclude Include="stb_image_write.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />

@@ -60,6 +60,26 @@ void PDF_PAGE_imp::CloseRTree(PDF_PAGEOBJECT_RTREE** rt)
 	*rt = NULL;
 }
 
+void PDF_PAGE_imp::RenderToBitmapEx(PDF_BITMAP* bitmap, 
+	float a, float b, float c, float d, float e, float f,
+	float left, float top, float right, float bottom, int flags)
+{
+	FS_MATRIX mat;
+	mat.a = a;
+	mat.b = b;
+	mat.c = c;
+	mat.d = d;
+	mat.e = e;
+	mat.f = f;
+	FS_RECTF clipping;
+	clipping.left = left;
+	clipping.top = top;
+	clipping.right = right;
+	clipping.bottom = bottom;
+	FPDF_RenderPageBitmapWithMatrix(IMP(PDF_BITMAP, bitmap)->m_bitmap, 
+		m_page, &mat, &clipping, flags);
+}
+
 // Í¨¹ý PDF_PAGE ¼Ì³Ð
 PDF_PAGE::PAGE_RATEION PDF_PAGE_imp::GetRotation()
 {

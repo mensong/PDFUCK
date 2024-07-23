@@ -62,11 +62,13 @@ public:
 
 	virtual void RenderToBitmap(PDF_BITMAP* bitmap, int start_x, int start_y, int size_x, int size_y, int rotate, int flags) override;
 
-
-	// 通过 PDF_PAGE 继承
 	virtual PDF_PAGEOBJECT_RTREE* NewRTree() override;
 
 	virtual void CloseRTree(PDF_PAGEOBJECT_RTREE** rt) override;
+
+
+	// 通过 PDF_PAGE 继承
+	virtual void RenderToBitmapEx(PDF_BITMAP* bitmap, float a, float b, float c, float d, float e, float f, float left, float top, float right, float bottom, int flags) override;
 
 };
 

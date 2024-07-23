@@ -92,7 +92,7 @@ public:
 	};
 
 public:
-	virtual int GetFormat() = 0;
+	virtual FORMAT GetFormat() = 0;
 	virtual void FillRect(
 		int left,
 		int top,
@@ -104,6 +104,9 @@ public:
 	virtual int GetWidth() = 0;
 	virtual int GetHeight() = 0;
 	virtual int GetStride() = 0;
+	virtual int GetNumChannels() = 0;
+
+	virtual bool WriteToFile(const char* filePath) = 0;
 };
 
 class PDF_PAGEOBJECTMARK
@@ -479,7 +482,6 @@ public:
 		// boundaries of adjacent fill paths are less visible.
 		FPDF_CONVERT_FILL_TO_STROKE = 0x20,
 	};
-
 	virtual void RenderToDC(
 		HDC dc,
 		int start_x,
@@ -497,6 +499,15 @@ public:
 		int rotate,
 		int/*RENDER_FLAGS*/ flags) = 0;
 
+	//_LT0 - LEFT TOP base coordinate
+	virtual void RenderToBitmapEx(
+		PDF_BITMAP* bitmap,
+		float a, float b,
+		float c, float d,
+		float e, float f,
+		float left_LT0, float top_LT0,
+		float right_LT0, float bottom_LT0,
+		int/*RENDER_FLAGS*/ flags) = 0;
 
 };
 
@@ -533,7 +544,7 @@ public:
 
 	virtual PDF_BITMAP* NewBitmap(int width, int height, PDF_BITMAP::FORMAT format,
 		uint8_t* pBuffer = NULL, uint32_t pitch = 0) = 0;
-	virtual PDF_BITMAP* NewBitmap(int width, int height, int alpha) = 0;
+	virtual PDF_BITMAP* NewBitmap(int width, int height, bool alpha) = 0;
 	virtual void CloseBitmap(PDF_BITMAP** bitmap) = 0;
 
 	enum SAVE_FLAG

@@ -782,12 +782,32 @@ void testCompareOverride()
 
 void testRender()
 {
-	auto doc = PDFuck::Ins().LoadDocumentFromFile("shape1.pdf", NULL);
+	auto doc = PDFuck::Ins().LoadDocumentFromFile("123.pdf", NULL);
 
 	int countPages = doc->CountPages();
 	for (int i = 0; i < countPages; i++)
 	{
 		auto page = doc->OpenPage(i);
+
+		{
+			PDF_BITMAP* bitmap = doc->NewBitmap(800, 600, 1);
+			page->RenderToBitmap(bitmap, 0, 0, 800, 600, 0, 0);
+			bitmap->WriteToFile("a.png");
+			doc->CloseBitmap(&bitmap);
+		}
+
+		{
+			PDF_BITMAP* bitmap = doc->NewBitmap(800, 600, 1);
+			page->RenderToBitmapEx(bitmap, 
+				1, 0, 0, 1, 1, 1, 
+				100, 100, 400, 400, 
+				0);
+			bitmap->WriteToFile("b.png");
+			doc->CloseBitmap(&bitmap);
+		}
+
+		doc->ClosePage(&page);
+		break;
 	}
 
 	PDFuck::Ins().CloseDocument(&doc);
@@ -803,6 +823,7 @@ int main()
 	//testReadWriteText();
 	//testCompareLeftRight();
 	//testCompareOverride();
+	testRender();
 
 	PDFuck::Ins().GlobalDestroyLibrary();
 	return 0;

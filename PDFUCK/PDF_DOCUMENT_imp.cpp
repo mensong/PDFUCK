@@ -206,14 +206,17 @@ bool PDF_DOCUMENT_imp::SaveTo(const char* filePath, SAVE_FLAG flag)
 	return res;
 }
 
-PDF_BITMAP* PDF_DOCUMENT_imp::NewBitmap(int width, int height, int alpha)
+PDF_BITMAP* PDF_DOCUMENT_imp::NewBitmap(int width, int height, bool alpha)
 {
-	return new PDF_BITMAP_imp(width, height, alpha);
+	auto o = FPDFBitmap_Create(width, height, (int)alpha);
+	if (!o)
+		return NULL;
+	return new PDF_BITMAP_imp(o);
 }
 
 void PDF_DOCUMENT_imp::CloseBitmap(PDF_BITMAP** bitmap)
 {
-	auto o = IMP(PDF_BITMAP, bitmap);
+	auto o = IMP(PDF_BITMAP, *bitmap);
 	delete o;
 	*bitmap = NULL;
 }
@@ -295,7 +298,7 @@ PDF_FONT* PDF_DOCUMENT_imp::LoadFontFromFile(const char* fontFilePath, PDF_FONT:
 	return font;
 }
 
-PDF_BITMAP* PDF_DOCUMENT_imp::NewBitmap(int width, int height, PDF_BITMAP::FORMAT format, 
+PDF_BITMAP* PDF_DOCUMENT_imp::NewBitmap(int width, int height, PDF_BITMAP::FORMAT format,
 	uint8_t* pBuffer, uint32_t pitch)
 {
 	auto pBitmap = pdfium::MakeRetain<CFX_DIBitmap>();

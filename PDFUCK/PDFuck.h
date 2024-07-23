@@ -79,6 +79,19 @@ enum PDF_TEXT_RENDERMODE
 class PDF_BITMAP
 {
 public:
+	enum FORMAT 
+	{
+		kInvalid = 0,
+		k1bppRgb = 0x001,
+		k8bppRgb = 0x008,
+		kRgb = 0x018,
+		kRgb32 = 0x020,
+		k1bppMask = 0x101,
+		k8bppMask = 0x108,
+		kArgb = 0x220,
+	};
+
+public:
 	virtual int GetFormat() = 0;
 	virtual void FillRect(
 		int left,
@@ -510,7 +523,7 @@ public:
 	virtual PDF_PAGEOBJECT* NewTextPageObject(PDF_FONT* font, float font_size) = 0;
 	virtual void DestroyUnmanagedPageObject(PDF_PAGEOBJECT* pageObj) = 0;
 	virtual void ClosePageObject(PDF_PAGEOBJECT** pageObj) = 0;
-
+		
 	virtual PDF_FONT* LoadFontFromMemory(const uint8_t* data, uint32_t size, 
 		PDF_FONT::FONT_TYPE font_type, bool cid) = 0;
 	virtual PDF_FONT* LoadFontFromFile(const char* fontFilePath,
@@ -518,6 +531,8 @@ public:
 	virtual PDF_FONT* LoadStandardFont(const char* fontWithoutSpaces) = 0;
 	virtual void CloseFont(PDF_FONT** font) = 0;
 
+	virtual PDF_BITMAP* NewBitmap(int width, int height, PDF_BITMAP::FORMAT format,
+		uint8_t* pBuffer = NULL, uint32_t pitch = 0) = 0;
 	virtual PDF_BITMAP* NewBitmap(int width, int height, int alpha) = 0;
 	virtual void CloseBitmap(PDF_BITMAP** bitmap) = 0;
 
@@ -552,7 +567,7 @@ PDF_API void GlobalDestroyLibrary();
 PDF_API PDF_DOCUMENT* CreateDocument();
 PDF_API PDF_DOCUMENT* LoadDocumentFromFile(const char* file_path, const char* password);
 PDF_API PDF_DOCUMENT* LoadDocumentFromMemory(const void* data_buf, size_t size, const char* password);
-PDF_API void DestroyDocument(PDF_DOCUMENT** doc);
+PDF_API void CloseDocument(PDF_DOCUMENT** doc);
 
 
 class PDFuck
@@ -569,7 +584,7 @@ public:
 	DEF_PROC(CreateDocument);
 	DEF_PROC(LoadDocumentFromFile);
 	DEF_PROC(LoadDocumentFromMemory);
-	DEF_PROC(DestroyDocument);
+	DEF_PROC(CloseDocument);
 
 	PDFuck()
 	{
@@ -582,7 +597,7 @@ public:
 		SET_PROC(hDll, CreateDocument);
 		SET_PROC(hDll, LoadDocumentFromFile);
 		SET_PROC(hDll, LoadDocumentFromMemory);
-		SET_PROC(hDll, DestroyDocument);
+		SET_PROC(hDll, CloseDocument);
 	}
 
 

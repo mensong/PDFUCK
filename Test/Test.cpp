@@ -247,7 +247,7 @@ void testCreate()
 
 	doc->SaveTo("1.pdf", doc->PDF_NO_INCREMENTAL);
 
-	PDFuck::Ins().DestroyDocument(&doc);
+	PDFuck::Ins().CloseDocument(&doc);
 
 }
 
@@ -335,7 +335,7 @@ void testReadWriteText()
 		doc->SaveTo("1_1.pdf", doc->PDF_NO_INCREMENTAL);
 	}
 
-	PDFuck::Ins().DestroyDocument(&doc);
+	PDFuck::Ins().CloseDocument(&doc);
 }
 
 void generateComparePdf()
@@ -382,7 +382,7 @@ void generateComparePdf()
 
 	doc->SaveTo("a.pdf", doc->PDF_NO_INCREMENTAL);
 
-	PDFuck::Ins().DestroyDocument(&doc);
+	PDFuck::Ins().CloseDocument(&doc);
 }
 
 
@@ -679,8 +679,8 @@ void testCompareLeftRight()
 	doc1->SaveTo("left.pdf", PDF_DOCUMENT::PDF_NO_INCREMENTAL);
 	doc2->SaveTo("right.pdf", PDF_DOCUMENT::PDF_NO_INCREMENTAL);
 
-	PDFuck::Ins().DestroyDocument(&doc1);
-	PDFuck::Ins().DestroyDocument(&doc2);
+	PDFuck::Ins().CloseDocument(&doc1);
+	PDFuck::Ins().CloseDocument(&doc2);
 }
 
 void testCompareOverride()
@@ -716,7 +716,7 @@ void testCompareOverride()
 	
 	//auto expDoc = docMerge->ExportNPagesToOne(800, 600, 1, 2);	
 	//expDoc->SaveTo("EXP.pdf", PDF_DOCUMENT::SAVE_FLAG::PDF_NO_INCREMENTAL);
-	//PDFuck::Ins().DestroyDocument(&expDoc);
+	//PDFuck::Ins().CloseDocument(&expDoc);
 
 	for (int i = 0; i < countPages1 && i < countPages2; i++)
 	{
@@ -776,8 +776,21 @@ void testCompareOverride()
 
 	docMerge->SaveTo("merge.pdf", PDF_DOCUMENT::PDF_NO_INCREMENTAL);
 
-	PDFuck::Ins().DestroyDocument(&docMerge);
-	PDFuck::Ins().DestroyDocument(&doc2);
+	PDFuck::Ins().CloseDocument(&docMerge);
+	PDFuck::Ins().CloseDocument(&doc2);
+}
+
+void testRender()
+{
+	auto doc = PDFuck::Ins().LoadDocumentFromFile("shape1.pdf", NULL);
+
+	int countPages = doc->CountPages();
+	for (int i = 0; i < countPages; i++)
+	{
+		auto page = doc->OpenPage(i);
+	}
+
+	PDFuck::Ins().CloseDocument(&doc);
 }
 
 int main()
@@ -789,7 +802,7 @@ int main()
 	//testCreate();
 	//testReadWriteText();
 	//testCompareLeftRight();
-	testCompareOverride();
+	//testCompareOverride();
 
 	PDFuck::Ins().GlobalDestroyLibrary();
 	return 0;

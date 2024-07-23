@@ -295,6 +295,22 @@ PDF_FONT* PDF_DOCUMENT_imp::LoadFontFromFile(const char* fontFilePath, PDF_FONT:
 	return font;
 }
 
+PDF_BITMAP* PDF_DOCUMENT_imp::NewBitmap(int width, int height, PDF_BITMAP::FORMAT format, 
+	uint8_t* pBuffer, uint32_t pitch)
+{
+	auto pBitmap = pdfium::MakeRetain<CFX_DIBitmap>();
+	if (!pBitmap->Create(width, height, (FXDIB_Format)format, pBuffer, pitch)) 
+	{
+		pBitmap.Reset();
+		return NULL;
+	}
+	auto o = FPDFBitmapFromCFXDIBitmap(pBitmap.Leak());
+	if (!o)
+		return NULL;
+
+	return new PDF_BITMAP_imp(o);
+}
+
 // Í¨¹ý PDF_DOCUMENT ¼Ì³Ð
 void PDF_DOCUMENT_imp::ClosePageObject(PDF_PAGEOBJECT** pageObj)
 {

@@ -109,4 +109,8 @@ public:
 	// 通过 PDF_DOCUMENT 继承
 	virtual PDF_FONT* LoadFontFromFile(const char* fontFilePath, PDF_FONT::FONT_TYPE font_type, bool cid) override;
 
+
+	// 通过 PDF_DOCUMENT 继承
+	virtual PDF_BITMAP* NewBitmap(int width, int height, PDF_BITMAP::FORMAT format, uint8_t* pBuffer, uint32_t pitch) override;
+
 };

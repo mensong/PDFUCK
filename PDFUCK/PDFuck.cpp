@@ -46,7 +46,7 @@ PDF_API PDF_DOCUMENT* LoadDocumentFromMemory(const void* data_buf, size_t size, 
 	return new PDF_DOCUMENT_imp(doc);
 }
 
-PDF_API void DestroyDocument(PDF_DOCUMENT** doc)
+PDF_API void CloseDocument(PDF_DOCUMENT** doc)
 {
 	PDF_DOCUMENT_imp* p = dynamic_cast<PDF_DOCUMENT_imp*>(*doc);
 	delete p;

@@ -433,6 +433,7 @@ bool comparePagePaths(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* p
 		//只处理path
 		if (pageObj->GetType() == PDF_PAGEOBJ_PATH)
 		{
+			//auto countSegs = pageObj->Path_CountSegments();	
 			if (pageObj->GetBounds(&left, &bottom, &right, &top))
 			{
 				float minPos[2] = { left , bottom };
@@ -486,8 +487,8 @@ void CompareLeftRight(const std::string& pdf1, const std::string& pdf2,
 		bool page1TextHasDiff = comparePageTextWithCommonString(doc1, page1, doc2, page2);
 		bool page2TextHasDiff = page1TextHasDiff;
 
-        bool page1PathHasDiff = comparePagePaths(doc1, page1, page2);
-        bool page2PathHasDiff = comparePagePaths(doc2, page2, page1);
+		bool page1PathHasDiff = comparePagePaths(doc1, page1, page2);
+		bool page2PathHasDiff = comparePagePaths(doc2, page2, page1);
 
         if (page1TextHasDiff || page1PathHasDiff)
             page1->CommitChange();
@@ -654,7 +655,7 @@ int main(int argc, char** argv)
 
     if (argc < 4)
     {
-        std::cout << "Usage: pdf1 pdf2 mode(lf/ov) [leftPdf(lf) rightPdf(lf) mergePdf(ov)]" << std::endl;
+        std::cout << "Usage: pdf1 pdf2 mode(lr/ov) [leftPdf(lr) rightPdf(lr) mergePdf(ov)]" << std::endl;
         return 1;
     }
     
@@ -666,7 +667,7 @@ int main(int argc, char** argv)
     std::string mergePdf;
     if (argc > 4)
     {
-        if (mode == "lf" && argc >= 6)
+        if (mode == "lr" && argc >= 6)
         {
             leftPdf = argv[4];
             rightPdf = argv[5];
@@ -684,14 +685,12 @@ int main(int argc, char** argv)
         std::string filename2 = pdf2.substr(0, idxDot2);
         leftPdf = filename1 + "_diff.pdf";
         rightPdf = filename2 + "_diff.pdf";
-        mode = "lf";
+        mode = "lr";
     }
 
-	if (mode == "lf")
+	if (mode == "lr")
 	{
-		PDFuck::Ins().GlobalInitializeLibrary();
 		CompareLeftRight(pdf1, pdf2, leftPdf, rightPdf);
-		PDFuck::Ins().GlobalDestroyLibrary();
 	}
 
     return 0;

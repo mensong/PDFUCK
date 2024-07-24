@@ -1,22 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>y1.pdf y2.pdf lf left.pdf right.pdf</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>B1.pdf B2.pdf lr left.pdf right.pdf</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommandArguments>A1.pdf A2.pdf lf left.pdf right.pdf</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>A1.pdf A2.pdf lr left.pdf right.pdf</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>y1.pdf y2.pdf lf left.pdf right.pdf</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>B1.pdf B2.pdf lr left.pdf right.pdf</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>A1.pdf A2.pdf lf left.pdf right.pdf</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>A1.pdf A2.pdf lr left.pdf right.pdf</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>

@@ -488,15 +488,16 @@ public:
 		int start_y,
 		int size_x,
 		int size_y,
-		int rotate,
+		PAGE_RATEION rotate,
 		int/*RENDER_FLAGS*/ flags) = 0;
+
 	virtual void RenderToBitmap(
 		PDF_BITMAP* bitmap,
 		int start_x,
 		int start_y,
 		int size_x,
 		int size_y,
-		int rotate,
+		PAGE_RATEION rotate,
 		int/*RENDER_FLAGS*/ flags) = 0;
 
 	//_LT0 - LEFT TOP base coordinate
@@ -571,10 +572,6 @@ public:
 	virtual const PDF_FONT* GetDefaultFont() = 0;
 };
 
-//每个dll内存实例只调用一次
-PDF_API void GlobalInitializeLibrary();
-PDF_API void GlobalDestroyLibrary();
-
 PDF_API PDF_DOCUMENT* CreateDocument();
 PDF_API PDF_DOCUMENT* LoadDocumentFromFile(const char* file_path, const char* password);
 PDF_API PDF_DOCUMENT* LoadDocumentFromMemory(const void* data_buf, size_t size, const char* password);
@@ -590,8 +587,6 @@ class PDFuck
 	this->name = (decltype(::name)*)::GetProcAddress(hDll, #name)
 
 public:
-	DEF_PROC(GlobalInitializeLibrary);
-	DEF_PROC(GlobalDestroyLibrary);
 	DEF_PROC(CreateDocument);
 	DEF_PROC(LoadDocumentFromFile);
 	DEF_PROC(LoadDocumentFromMemory);
@@ -603,8 +598,6 @@ public:
 		if (!hDll)
 			return;
 
-		SET_PROC(hDll, GlobalInitializeLibrary);
-		SET_PROC(hDll, GlobalDestroyLibrary);
 		SET_PROC(hDll, CreateDocument);
 		SET_PROC(hDll, LoadDocumentFromFile);
 		SET_PROC(hDll, LoadDocumentFromMemory);

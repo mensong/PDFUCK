@@ -5,27 +5,44 @@
 #include <fpdf_edit.h>
 #include "PDF_DOCUMENT_imp.h"
 
-bool g_Initialized = false;
-PDF_API void GlobalInitializeLibrary()
+class __GlobalInitializeLibrary
 {
-	FPDF_LIBRARY_CONFIG config;
-	config.m_pIsolate = NULL;
-	config.m_pPlatform = NULL;
-	config.m_v8EmbedderSlot = NULL;
-	config.m_pUserFontPaths = NULL;
-	config.version = 2;
-	FPDF_InitLibraryWithConfig(&config);
-	g_Initialized = true;
-}
+public:
+	static bool g_Initialized;
+	void InitializeLibrary()
+	{
+		if (g_Initialized)
+			return;
+		FPDF_LIBRARY_CONFIG config;
+		config.m_pIsolate = NULL;
+		config.m_pPlatform = NULL;
+		config.m_v8EmbedderSlot = NULL;
+		config.m_pUserFontPaths = NULL;
+		config.version = 2;
+		FPDF_InitLibraryWithConfig(&config);
+		g_Initialized = true;
+	}
 
-PDF_API void GlobalDestroyLibrary()
-{
-	if (!g_Initialized)
-		return;
-	FPDF_DestroyLibrary();
-	g_Initialized = false;
-}
+	void DestroyLibrary()
+	{
+		if (!g_Initialized)
+			return;
+		FPDF_DestroyLibrary();
+		g_Initialized = false;
+	}
 
+public:
+	__GlobalInitializeLibrary()
+	{
+		InitializeLibrary();
+	}
+	~__GlobalInitializeLibrary()
+	{
+		DestroyLibrary();
+	}
+} __GlobalInitOnce;
+
+bool __GlobalInitializeLibrary::g_Initialized = false;
 
 PDF_API PDF_DOCUMENT* CreateDocument()
 {

@@ -21,20 +21,41 @@ CPDFenderDlg::CPDFenderDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_PDFENDER_DIALOG, pParent)
 	, m_doc(NULL)
 	, m_curPage(NULL)
+	, m_curPageIndex(-1)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+}
+
+void CPDFenderDlg::switchToPage(int pageIndex)
+{
+	if (!m_doc)
+		return;
+	if (pageIndex == m_curPageIndex)
+		return;
+
+	if (m_curPage)
+		m_doc->ClosePage(&m_curPage);
+
+	m_curPage = m_doc->OpenPage(pageIndex);
+	m_curPageIndex = pageIndex;
+	m_renderStatic.SetPage(m_curPage);
+	m_renderStatic.Invalidate();
+
+	m_cmbPageIndexs.SetCurSel(pageIndex);
 }
 
 void CPDFenderDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_RENDER, m_renderStatic);
+	DDX_Control(pDX, IDC_CMB_PAGES, m_cmbPageIndexs);
 }
 
 BEGIN_MESSAGE_MAP(CPDFenderDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BTN_OPEN, &CPDFenderDlg::OnBnClickedBtnOpen)
+	ON_CBN_SELCHANGE(IDC_CMB_PAGES, &CPDFenderDlg::OnCbnSelchangeCmbPages)
 END_MESSAGE_MAP()
 
 
@@ -79,14 +100,6 @@ void CPDFenderDlg::OnPaint()
 	}
 	else
 	{
-		if (m_curPage)
-		{
-			CPaintDC dc(&m_renderStatic); // 用于绘制的设备上下文
-			CRect rc;
-			m_renderStatic.GetWindowRect(&rc);
-			m_curPage->RenderToDC(dc.m_hDC, 0, 0, rc.Width(), rc.Height(), 0, 0);
-		}
-
 		CDialogEx::OnPaint();
 	}
 }
@@ -98,9 +111,62 @@ HCURSOR CPDFenderDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+bool OpenFileDialog(TCHAR* filePath, int size, HWND hParent = NULL) 
+{
+	OPENFILENAME ofn;       // 公共对话框结构
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hParent;   // 父窗口句柄，可以为NULL
+	ofn.lpstrFilter = _T("All Files\0*.*\0PDF Files\0*.pdf\0"); // 文件过滤器
+	ofn.lpstrInitialDir = _T("C:\\"); // 初始目录
+	ofn.lpstrFile = filePath;  // 保存选择的文件路径
+	ofn.nMaxFile = size;   // 文件路径最大长度
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER; // 标志
 
+	return GetOpenFileName(&ofn) == TRUE; // 显示对话框并返回是否成功
+}
 
 void CPDFenderDlg::OnBnClickedBtnOpen()
 {
+	TCHAR szBuffer[MAX_PATH] = { 0 };
+	if (!OpenFileDialog(szBuffer, MAX_PATH, m_hWnd))
+		return;
+
+	std::string pdfFile = (LPSTR)CW2A(szBuffer);
+
+	m_cmbPageIndexs.Clear();
+	if (m_doc)
+	{
+		if (m_curPage)
+			m_doc->ClosePage(&m_curPage);
+		PDFuck::Ins().CloseDocument(&m_doc);
+	}
 	
+	m_doc = PDFuck::Ins().LoadDocumentFromFile(pdfFile.c_str(), NULL);
+	if (!m_doc)
+		return;
+		
+	int countPages = m_doc->CountPages();
+	for (int i = 0; i < countPages; i++)
+	{
+		m_cmbPageIndexs.AddString(std::to_wstring(i + 1).c_str());
+	}
+
+	if (countPages > 0)
+	{
+		switchToPage(0);
+	}
+}
+
+
+void CPDFenderDlg::OnCbnSelchangeCmbPages()
+{
+	CString sPage;
+	m_cmbPageIndexs.GetWindowText(sPage);
+	
+	int pageIndex = _wtoi(sPage.GetString());
+	if (pageIndex > 0)
+	{
+		switchToPage(pageIndex - 1);
+	}
 }

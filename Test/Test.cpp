@@ -791,7 +791,7 @@ void testRender()
 
 		{
 			PDF_BITMAP* bitmap = doc->NewBitmap(800, 600, 1);
-			page->RenderToBitmap(bitmap, 0, 0, 800, 600, 0, 0);
+			page->RenderToBitmap(bitmap, 0, 0, 800, 600, PDF_PAGE::PAGE_RATEION_0, 0);
 			bitmap->WriteToFile("a.png");
 			doc->CloseBitmap(&bitmap);
 		}
@@ -817,14 +817,11 @@ int main()
 {
 	std::wcout.imbue(std::locale("chs"));
 
-	PDFuck::Ins().GlobalInitializeLibrary();
-
 	//testCreate();
 	//testReadWriteText();
 	//testCompareLeftRight();
 	//testCompareOverride();
 	testRender();
 
-	PDFuck::Ins().GlobalDestroyLibrary();
 	return 0;
 }

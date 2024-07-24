@@ -484,19 +484,19 @@ public:
 	};
 	virtual void RenderToDC(
 		HDC dc,
-		int start_x,
-		int start_y,
-		int size_x,
-		int size_y,
+		int x_inDC,
+		int y_inDC,
+		int size_x_inDC,
+		int size_y_inDC,
 		PAGE_RATEION rotate,
 		int/*RENDER_FLAGS*/ flags) = 0;
 
 	virtual void RenderToBitmap(
 		PDF_BITMAP* bitmap,
-		int start_x,
-		int start_y,
-		int size_x,
-		int size_y,
+		int x_inBitmap,
+		int y_inBitmap,
+		int size_x_inBitmap,
+		int size_y_inBitmap,
 		PAGE_RATEION rotate,
 		int/*RENDER_FLAGS*/ flags) = 0;
 
@@ -506,8 +506,8 @@ public:
 		float a, float b,
 		float c, float d,
 		float e, float f,
-		float left_LT0, float top_LT0,
-		float right_LT0, float bottom_LT0,
+		float left_inBitmap, float top_inBitmap,
+		float right_inBitmap, float bottom_inBitmap,
 		int/*RENDER_FLAGS*/ flags) = 0;
 
 };

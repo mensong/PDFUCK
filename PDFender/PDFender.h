@@ -27,6 +27,7 @@ public:
 // 实现
 
 	DECLARE_MESSAGE_MAP()
+		afx_msg void OnCbnSelchangeCmbPages();
 };
 
 extern CPDFenderApp theApp;

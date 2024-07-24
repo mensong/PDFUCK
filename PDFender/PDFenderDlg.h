@@ -4,6 +4,7 @@
 
 #pragma once
 #include "../PDFUCK/PDFuck.h"
+#include "CStaticPage.h"
 
 // CPDFenderDlg 对话框
 class CPDFenderDlg : public CDialogEx
@@ -16,10 +17,12 @@ public:
 
 	PDF_DOCUMENT* m_doc;
 	PDF_PAGE* m_curPage;
+	int m_curPageIndex;
+
+	void switchToPage(int pageIndex);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
-
 
 // 实现
 protected:
@@ -32,5 +35,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedBtnOpen();
-	CStatic m_renderStatic;
+	CStaticPage m_renderStatic;
+	CComboBox m_cmbPageIndexs;
+	afx_msg void OnCbnSelchangeCmbPages();
 };

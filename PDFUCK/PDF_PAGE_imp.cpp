@@ -37,16 +37,38 @@ float PDF_PAGE_imp::GetHeight()
 
 // 通过 PDF_PAGE 继承
 void PDF_PAGE_imp::RenderToDC(HDC dc,
-	int start_x, int start_y, int size_x, int size_y, int rotate, int flags)
+	int x_inDC, int y_inDC, int size_x_inDC, int size_y_inDC, PAGE_RATEION rotate, int flags)
 {
-	FPDF_RenderPage(dc, m_page, start_x, start_y, size_x, size_y, rotate, flags);
+	FPDF_RenderPage(dc, m_page, x_inDC, y_inDC, size_x_inDC, size_y_inDC, rotate, flags);
 }
 
 void PDF_PAGE_imp::RenderToBitmap(PDF_BITMAP* bitmap,
-	int start_x, int start_y, int size_x, int size_y, int rotate, int flags)
+	int x_inBitmap, int y_inBitmap, int size_x_inBitmap, int size_y_inBitmap, 
+	PAGE_RATEION rotate, int flags)
 {
 	PDF_BITMAP_imp* bp = dynamic_cast<PDF_BITMAP_imp*>(bitmap);
-	FPDF_RenderPageBitmap(bp->m_bitmap, m_page, start_x, start_y, size_x, size_y, rotate, flags);
+	FPDF_RenderPageBitmap(bp->m_bitmap, m_page, x_inBitmap, y_inBitmap, 
+		size_x_inBitmap, size_y_inBitmap, rotate, flags);
+}
+
+void PDF_PAGE_imp::RenderToBitmapEx(PDF_BITMAP* bitmap,
+	float a, float b, float c, float d, float e, float f,
+	float left_inBitmap, float top_inBitmap, float right_inBitmap, float bottom_inBitmap, int flags)
+{
+	FS_MATRIX mat;
+	mat.a = a;
+	mat.b = b;
+	mat.c = c;
+	mat.d = d;
+	mat.e = e;
+	mat.f = f;
+	FS_RECTF clipping;
+	clipping.left = left_inBitmap;
+	clipping.top = top_inBitmap;
+	clipping.right = right_inBitmap;
+	clipping.bottom = bottom_inBitmap;
+	FPDF_RenderPageBitmapWithMatrix(IMP(PDF_BITMAP, bitmap)->m_bitmap,
+		m_page, &mat, &clipping, flags);
 }
 
 PDF_PAGEOBJECT_RTREE* PDF_PAGE_imp::NewRTree()
@@ -58,26 +80,6 @@ void PDF_PAGE_imp::CloseRTree(PDF_PAGEOBJECT_RTREE** rt)
 {
 	delete IMP(PDF_PAGEOBJECT_RTREE, *rt);
 	*rt = NULL;
-}
-
-void PDF_PAGE_imp::RenderToBitmapEx(PDF_BITMAP* bitmap, 
-	float a, float b, float c, float d, float e, float f,
-	float left, float top, float right, float bottom, int flags)
-{
-	FS_MATRIX mat;
-	mat.a = a;
-	mat.b = b;
-	mat.c = c;
-	mat.d = d;
-	mat.e = e;
-	mat.f = f;
-	FS_RECTF clipping;
-	clipping.left = left;
-	clipping.top = top;
-	clipping.right = right;
-	clipping.bottom = bottom;
-	FPDF_RenderPageBitmapWithMatrix(IMP(PDF_BITMAP, bitmap)->m_bitmap, 
-		m_page, &mat, &clipping, flags);
 }
 
 // 通过 PDF_PAGE 继承

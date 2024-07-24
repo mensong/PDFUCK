@@ -53,12 +53,15 @@ void CStaticPage::OnPaint()
 		renderY = (dcHeight - renderHeight) / 2.0f;
 
 		//»­²¼
-		CRect rectCanvas;
-		rectCanvas.left = renderX;
-		rectCanvas.right = renderX + renderWidth;
-		rectCanvas.top = renderY;
-		rectCanvas.bottom = renderY + renderHeight;
-		dc.FillSolidRect(rectCanvas, RGB(255, 255, 255));
+		if (!m_pdfPage->HasTransparency())
+		{
+			CRect rectCanvas;
+			rectCanvas.left = renderX;
+			rectCanvas.right = renderX + renderWidth;
+			rectCanvas.top = renderY;
+			rectCanvas.bottom = renderY + renderHeight;
+			dc.FillSolidRect(rectCanvas, RGB(255, 255, 255));
+		}
 
 		//ÄÚÈÝ
 		m_pdfPage->RenderToDC(dc.GetSafeHdc(),

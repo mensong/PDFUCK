@@ -10,12 +10,12 @@
 // 通过 PDF_PAGE 继承
 float PDF_PAGE_imp::GetWidth()
 {
-	PAGE_RATEION rotate = GetRotation();
-	if (rotate == PAGE_RATEION::PAGE_RATEION_90 ||
-		rotate == PAGE_RATEION::PAGE_RATEION_270)
-	{
-		return FPDF_GetPageHeight(m_page);
-	}
+	//PAGE_RATEION rotate = GetRotation();
+	//if (rotate == PAGE_RATEION::PAGE_RATEION_90 ||
+	//	rotate == PAGE_RATEION::PAGE_RATEION_270)
+	//{
+	//	return FPDF_GetPageHeight(m_page);
+	//}
 
 	return FPDF_GetPageWidth(m_page);
 }
@@ -24,12 +24,12 @@ float PDF_PAGE_imp::GetWidth()
 // 通过 PDF_PAGE 继承
 float PDF_PAGE_imp::GetHeight()
 {
-	int rotate = GetRotation();
-	if (rotate == PAGE_RATEION::PAGE_RATEION_90 ||
-		rotate == PAGE_RATEION::PAGE_RATEION_270)
-	{
-		return FPDF_GetPageWidth(m_page);
-	}
+	//int rotate = GetRotation();
+	//if (rotate == PAGE_RATEION::PAGE_RATEION_90 ||
+	//	rotate == PAGE_RATEION::PAGE_RATEION_270)
+	//{
+	//	return FPDF_GetPageWidth(m_page);
+	//}
 
 	return FPDF_GetPageHeight(m_page);
 }
@@ -37,18 +37,18 @@ float PDF_PAGE_imp::GetHeight()
 
 // 通过 PDF_PAGE 继承
 void PDF_PAGE_imp::RenderToDC(HDC dc,
-	int x_inDC, int y_inDC, int size_x_inDC, int size_y_inDC, PAGE_RATEION rotate, int flags)
+	int x_inDC, int y_inDC, int size_x_inDC, int size_y_inDC, PAGE_RATEION rotate_inDC, int flags)
 {
-	FPDF_RenderPage(dc, m_page, x_inDC, y_inDC, size_x_inDC, size_y_inDC, rotate, flags);
+	FPDF_RenderPage(dc, m_page, x_inDC, y_inDC, size_x_inDC, size_y_inDC, rotate_inDC, flags);
 }
 
 void PDF_PAGE_imp::RenderToBitmap(PDF_BITMAP* bitmap,
 	int x_inBitmap, int y_inBitmap, int size_x_inBitmap, int size_y_inBitmap, 
-	PAGE_RATEION rotate, int flags)
+	PAGE_RATEION rotate_inBitmap, int flags)
 {
 	PDF_BITMAP_imp* bp = dynamic_cast<PDF_BITMAP_imp*>(bitmap);
 	FPDF_RenderPageBitmap(bp->m_bitmap, m_page, x_inBitmap, y_inBitmap, 
-		size_x_inBitmap, size_y_inBitmap, rotate, flags);
+		size_x_inBitmap, size_y_inBitmap, rotate_inBitmap, flags);
 }
 
 void PDF_PAGE_imp::RenderToBitmapEx(PDF_BITMAP* bitmap,

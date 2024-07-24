@@ -30,7 +30,8 @@ void CPDFenderDlg::switchToPage(int pageIndex)
 {
 	if (!m_doc)
 		return;
-	if (pageIndex == m_curPageIndex)
+	if (pageIndex == m_curPageIndex || pageIndex < 0 || 
+		pageIndex >= m_doc->CountPages())
 		return;
 
 	if (m_curPage)
@@ -56,6 +57,8 @@ BEGIN_MESSAGE_MAP(CPDFenderDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BTN_OPEN, &CPDFenderDlg::OnBnClickedBtnOpen)
 	ON_CBN_SELCHANGE(IDC_CMB_PAGES, &CPDFenderDlg::OnCbnSelchangeCmbPages)
+	ON_BN_CLICKED(IDC_BTN_PRE_PAGE, &CPDFenderDlg::OnBnClickedBtnPrePage)
+	ON_BN_CLICKED(IDC_BTN_NEXT_PAGE, &CPDFenderDlg::OnBnClickedBtnNextPage)
 END_MESSAGE_MAP()
 
 
@@ -71,6 +74,18 @@ BOOL CPDFenderDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+	m_scale.AddExclude(GetDlgItem(IDC_BTN_OPEN)->m_hWnd);
+	m_scale.AddExclude(m_cmbPageIndexs.m_hWnd);
+	m_scale.AddExclude(GetDlgItem(IDC_STATIC_PAGE)->m_hWnd);
+	m_scale.AddExclude(GetDlgItem(IDC_BTN_PRE_PAGE)->m_hWnd);
+	m_scale.AddExclude(GetDlgItem(IDC_BTN_NEXT_PAGE)->m_hWnd);
+	m_scale.SetAnchor(m_renderStatic.m_hWnd, 
+		CCtrlScale::AnchorLeftToWinLeft |
+		CCtrlScale::AnchorRightToWinRight |
+		CCtrlScale::AnchorTopToWinTop |
+		CCtrlScale::AnchorBottomToWinBottom
+	);
+	m_scale.Init(m_hWnd);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -134,11 +149,12 @@ void CPDFenderDlg::OnBnClickedBtnOpen()
 
 	std::string pdfFile = (LPSTR)CW2A(szBuffer);
 
-	m_cmbPageIndexs.Clear();
+	m_cmbPageIndexs.ResetContent();
 	if (m_doc)
 	{
 		if (m_curPage)
 			m_doc->ClosePage(&m_curPage);
+		m_curPageIndex = -1;
 		PDFuck::Ins().CloseDocument(&m_doc);
 	}
 	
@@ -169,4 +185,16 @@ void CPDFenderDlg::OnCbnSelchangeCmbPages()
 	{
 		switchToPage(pageIndex - 1);
 	}
+}
+
+
+void CPDFenderDlg::OnBnClickedBtnPrePage()
+{
+	switchToPage(m_curPageIndex - 1);
+}
+
+
+void CPDFenderDlg::OnBnClickedBtnNextPage()
+{
+	switchToPage(m_curPageIndex + 1);
 }

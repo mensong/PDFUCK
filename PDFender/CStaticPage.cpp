@@ -26,12 +26,43 @@ void CStaticPage::OnPaint()
 	//»æÖÆ±³¾°
 	CRect rect;
 	GetClientRect(rect);
-	dc.FillSolidRect(rect, RGB(255, 255, 255));
+	dc.FillSolidRect(rect, RGB(0xcc, 0xcc, 0xcc));
 
 	if (m_pdfPage)
 	{
+		int renderX, renderY, renderWidth, renderHeight;
+
+		int pageWidth = m_pdfPage->GetWidth();
+		int pageHeight = m_pdfPage->GetHeight();
+		int dcWidth = rect.Width();
+		int dcHeight = rect.Height();
+		float pageFactor = pageWidth / (float)pageHeight;
+		float dcFactor = dcWidth / (float)dcHeight;
+		if (pageFactor > dcFactor)
+		{
+			renderWidth = dcWidth;
+			renderHeight = pageHeight / ((float)pageWidth / dcWidth );
+		}
+		else
+		{
+			renderWidth = pageWidth / ((float)pageHeight / dcHeight);
+			renderHeight = dcHeight;
+		}
+
+		renderX = (dcWidth - renderWidth) / 2.0f;
+		renderY = (dcHeight - renderHeight) / 2.0f;
+
+		//»­²¼
+		CRect rectCanvas;
+		rectCanvas.left = renderX;
+		rectCanvas.right = renderX + renderWidth;
+		rectCanvas.top = renderY;
+		rectCanvas.bottom = renderY + renderHeight;
+		dc.FillSolidRect(rectCanvas, RGB(255, 255, 255));
+
+		//ÄÚÈÝ
 		m_pdfPage->RenderToDC(dc.GetSafeHdc(),
-			0, 0, rect.Width(), rect.Height(), 
+			renderX, renderY, renderWidth, renderHeight,
 			PDF_PAGE::PAGE_RATEION_0, 0);
 	}
 }

@@ -60,11 +60,11 @@ public:
 
 	virtual void RenderToDC(HDC dc, 
 		int x_inDC, int y_inDC, int size_x_inDC, int size_y_inDC,
-		PAGE_RATEION rotate, int flags) override;
+		PAGE_RATEION rotate_inDC, int flags) override;
 
 	virtual void RenderToBitmap(PDF_BITMAP* bitmap, 
 		int x_inBitmap, int y_inBitmap, int size_x_inBitmap, int size_y_inBitmap,
-		PAGE_RATEION rotate, int flags) override;
+		PAGE_RATEION rotate_inBitmap, int flags) override;
 
 	virtual void RenderToBitmapEx(PDF_BITMAP* bitmap,
 		float a, float b, float c, float d, float e, float f,

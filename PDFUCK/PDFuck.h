@@ -488,7 +488,7 @@ public:
 		int y_inDC,
 		int size_x_inDC,
 		int size_y_inDC,
-		PAGE_RATEION rotate,
+		PAGE_RATEION rotate_inDC,
 		int/*RENDER_FLAGS*/ flags) = 0;
 
 	virtual void RenderToBitmap(
@@ -497,7 +497,7 @@ public:
 		int y_inBitmap,
 		int size_x_inBitmap,
 		int size_y_inBitmap,
-		PAGE_RATEION rotate,
+		PAGE_RATEION rotate_inBitmap,
 		int/*RENDER_FLAGS*/ flags) = 0;
 
 	//_LT0 - LEFT TOP base coordinate

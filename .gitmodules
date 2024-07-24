@@ -1,3 +1,6 @@
 [submodule "vs_pdfium"]
 	path = vs_pdfium
 	url = https://github.com/mensong/vs_pdfium.git
+[submodule "CtrlScale"]
+	path = CtrlScale
+	url = https://github.com/mensong/CtrlScale.git

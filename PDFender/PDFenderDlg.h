@@ -5,9 +5,11 @@
 #pragma once
 #include "../PDFUCK/PDFuck.h"
 #include "CStaticPage.h"
+#include "../CtrlScale/CtrlScale.h"
 
 // CPDFenderDlg 对话框
-class CPDFenderDlg : public CDialogEx
+class CPDFenderDlg 
+	: public CDialogEx
 {
 // 构造
 public:
@@ -20,6 +22,8 @@ public:
 	int m_curPageIndex;
 
 	void switchToPage(int pageIndex);
+
+	CCtrlScale m_scale;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
@@ -38,4 +42,6 @@ public:
 	CStaticPage m_renderStatic;
 	CComboBox m_cmbPageIndexs;
 	afx_msg void OnCbnSelchangeCmbPages();
+	afx_msg void OnBnClickedBtnPrePage();
+	afx_msg void OnBnClickedBtnNextPage();
 };

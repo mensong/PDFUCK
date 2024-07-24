@@ -129,7 +129,7 @@ void testCreate()
 
 		float fontSize = 12;
 
-		const wchar_t* text = L"\x1\x2\x2";
+		const wchar_t* text = L"我123爱456";
 		size_t textWidth = font->CalcStringWidth(text, fontSize);
 
 		{
@@ -817,11 +817,11 @@ int main()
 {
 	std::wcout.imbue(std::locale("chs"));
 
-	//testCreate();
+	testCreate();
 	//testReadWriteText();
 	//testCompareLeftRight();
 	//testCompareOverride();
-	testRender();
+	//testRender();
 
 	return 0;
 }

@@ -10,6 +10,7 @@ END_MESSAGE_MAP()
 
 CStaticPage::CStaticPage()
 	: m_pdfPage(NULL)
+	, m_drawPageBackgroup(true)
 {
 
 }
@@ -53,7 +54,7 @@ void CStaticPage::OnPaint()
 		renderY = (dcHeight - renderHeight) / 2.0f;
 
 		//»­²¼
-		if (!m_pdfPage->HasTransparency())
+		if (m_drawPageBackgroup)
 		{
 			CRect rectCanvas;
 			rectCanvas.left = renderX;
@@ -61,7 +62,7 @@ void CStaticPage::OnPaint()
 			rectCanvas.top = renderY;
 			rectCanvas.bottom = renderY + renderHeight;
 			dc.FillSolidRect(rectCanvas, RGB(255, 255, 255));
-		}
+		}		
 
 		//ÄÚÈÝ
 		m_pdfPage->RenderToDC(dc.GetSafeHdc(),

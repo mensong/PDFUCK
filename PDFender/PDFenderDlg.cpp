@@ -50,6 +50,7 @@ void CPDFenderDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_RENDER, m_renderStatic);
 	DDX_Control(pDX, IDC_CMB_PAGES, m_cmbPageIndexs);
+	DDX_Control(pDX, IDC_CHK_Transparency_CANVAS, m_chkTransparencyCanvas);
 }
 
 BEGIN_MESSAGE_MAP(CPDFenderDlg, CDialogEx)
@@ -59,6 +60,7 @@ BEGIN_MESSAGE_MAP(CPDFenderDlg, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_CMB_PAGES, &CPDFenderDlg::OnCbnSelchangeCmbPages)
 	ON_BN_CLICKED(IDC_BTN_PRE_PAGE, &CPDFenderDlg::OnBnClickedBtnPrePage)
 	ON_BN_CLICKED(IDC_BTN_NEXT_PAGE, &CPDFenderDlg::OnBnClickedBtnNextPage)
+	ON_BN_CLICKED(IDC_CHK_Transparency_CANVAS, &CPDFenderDlg::OnBnClickedChkTransparencyCanvas)
 END_MESSAGE_MAP()
 
 
@@ -79,6 +81,7 @@ BOOL CPDFenderDlg::OnInitDialog()
 	m_scale.AddExclude(GetDlgItem(IDC_STATIC_PAGE)->m_hWnd);
 	m_scale.AddExclude(GetDlgItem(IDC_BTN_PRE_PAGE)->m_hWnd);
 	m_scale.AddExclude(GetDlgItem(IDC_BTN_NEXT_PAGE)->m_hWnd);
+	m_scale.AddExclude(m_chkTransparencyCanvas.m_hWnd);
 	m_scale.SetAnchor(m_renderStatic.m_hWnd, 
 		CCtrlScale::AnchorLeftToWinLeft |
 		CCtrlScale::AnchorRightToWinRight |
@@ -197,4 +200,12 @@ void CPDFenderDlg::OnBnClickedBtnPrePage()
 void CPDFenderDlg::OnBnClickedBtnNextPage()
 {
 	switchToPage(m_curPageIndex + 1);
+}
+
+
+void CPDFenderDlg::OnBnClickedChkTransparencyCanvas()
+{
+	m_renderStatic.SetDrawPageBackgroup(
+		m_chkTransparencyCanvas.GetCheck() != BST_CHECKED);
+	m_renderStatic.Invalidate();
 }

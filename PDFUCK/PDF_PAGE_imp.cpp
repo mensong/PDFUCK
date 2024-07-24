@@ -5,6 +5,7 @@
 #include "PDF_TEXTPAGE_imp.h"
 #include "PDF_PAGEOBJECT_RTREE_imp.h"
 #include <fpdf_edit.h>
+#include <cpdfsdk_helpers.h>
 
 
 // Í¨¹ý PDF_PAGE ¼Ì³Ð

@@ -14,6 +14,9 @@ public:
 	PDF_PAGE* m_pdfPage;
 	void SetPage(PDF_PAGE* page) { m_pdfPage = page; }
 
+	bool m_drawPageBackgroup;
+	void SetDrawPageBackgroup(bool draw) { m_drawPageBackgroup = draw; }
+
 	DECLARE_MESSAGE_MAP()
 public:	
 	afx_msg void OnPaint();

@@ -44,4 +44,6 @@ public:
 	afx_msg void OnCbnSelchangeCmbPages();
 	afx_msg void OnBnClickedBtnPrePage();
 	afx_msg void OnBnClickedBtnNextPage();
+	CButton m_chkTransparencyCanvas;
+	afx_msg void OnBnClickedChkTransparencyCanvas();
 };

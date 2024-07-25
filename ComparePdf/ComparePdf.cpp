@@ -6,6 +6,7 @@
 #include <vector>
 #include "../PDFUCK/PDFuck.h"
 #include "../PDFUCK/RTreeEx.h"
+#include "../pystring/pystring.h"
 
 bool get_common_string(const std::string& s1, const std::string& s2, std::string& comStr, int& pos1, int& pos2)
 {
@@ -471,7 +472,7 @@ bool comparePagePaths(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* p
 }
 
 void CompareLeftRight(const std::string& pdf1, const std::string& pdf2, 
-	const std::string& leftPdf, const std::string& rightPdf)
+	const std::string& leftPdf, const std::string& rightPdf, int compareType)
 {
     auto doc1 = PDFuck::Ins().LoadDocumentFromFile(pdf1.c_str(), NULL);
     auto doc2 = PDFuck::Ins().LoadDocumentFromFile(pdf2.c_str(), NULL);
@@ -482,13 +483,24 @@ void CompareLeftRight(const std::string& pdf1, const std::string& pdf2,
         auto page1 = doc1->OpenPage(i);
         auto page2 = doc2->OpenPage(i);
 
-        //bool page1TextHasDiff = comparePageText(doc1, page1, page2);
-        //bool page2TextHasDiff = comparePageText(doc2, page2, page1);
-		bool page1TextHasDiff = comparePageTextWithCommonString(doc1, page1, doc2, page2);
-		bool page2TextHasDiff = page1TextHasDiff;
+		bool page1TextHasDiff = false;
+		bool page2TextHasDiff = false;
+		bool page1PathHasDiff = false;
+		bool page2PathHasDiff = false;
 
-		bool page1PathHasDiff = comparePagePaths(doc1, page1, page2);
-		bool page2PathHasDiff = comparePagePaths(doc2, page2, page1);
+		if (compareType == 0 || compareType == 1)
+		{
+			//page1TextHasDiff = comparePageText(doc1, page1, page2);
+			//page2TextHasDiff = comparePageText(doc2, page2, page1);
+			page1TextHasDiff = comparePageTextWithCommonString(doc1, page1, doc2, page2);
+			page2TextHasDiff = page1TextHasDiff;
+		}
+
+		if (compareType == 0 || compareType == 2)
+		{
+			page1PathHasDiff = comparePagePaths(doc1, page1, page2);
+			page2PathHasDiff = comparePagePaths(doc2, page2, page1);
+		}
 
         if (page1TextHasDiff || page1PathHasDiff)
             page1->CommitChange();
@@ -653,44 +665,115 @@ int main(int argc, char** argv)
 	//}
 	//return 0;
 
-    if (argc < 4)
-    {
-        std::cout << "Usage: pdf1 pdf2 mode(lr/ov) [leftPdf(lr) rightPdf(lr) mergePdf(ov)]" << std::endl;
-        return 1;
-    }
-    
-    std::string pdf1 = argv[1];
-    std::string pdf2 = argv[2];
-    std::string mode = argv[3];
-
-    std::string leftPdf, rightPdf;
-    std::string mergePdf;
-    if (argc > 4)
-    {
-        if (mode == "lr" && argc >= 6)
-        {
-            leftPdf = argv[4];
-            rightPdf = argv[5];
-        }
-        else
-        {
-            mergePdf = argv[4];
-        }
-    }
-    else
-    {
-        size_t idxDot1 = pdf1.find_last_of('.');
-        size_t idxDot2 = pdf2.find_last_of('.');
-        std::string filename1 = pdf1.substr(0, idxDot1);
-        std::string filename2 = pdf2.substr(0, idxDot2);
-        leftPdf = filename1 + "_diff.pdf";
-        rightPdf = filename2 + "_diff.pdf";
-        mode = "lr";
-    }
-
-	if (mode == "lr")
+	auto funcUsage = []()
 	{
-		CompareLeftRight(pdf1, pdf2, leftPdf, rightPdf);
+		std::cout << "Usage:" 
+			<< " -pdf1=pdf1" 
+			<< " -pdf2=pdf2" 
+			<< " -mode=leftright/merge"
+			<< " -left=leftPdf" 
+			<< " -right=rightPdf" 
+			<< " -merge=mergePdf" 
+			<< " -onlytext"
+			<< " -onlyshape"
+			<< std::endl;
+	};
+
+	std::string pdf1;
+	std::string pdf2;
+	std::string mode;
+	std::string leftPdf, rightPdf;
+	std::string mergePdf;
+	int compareType = 0;//0:全部；1:仅文本；2:仅图形
+
+	auto funcSplitArg = [](const std::string& arg, std::string& key, std::string& val)->void
+	{
+		if (pystring::startswith(arg, "-"))
+		{
+			std::string argkv = pystring::lstrip(arg, "-");
+			size_t idx = argkv.find('=');
+			if (idx == std::string::npos)
+			{//只有标志
+				key = argkv;
+			}
+			else
+			{//有KV
+				key = argkv.substr(0, idx);
+				val = argkv.substr(idx + 1);
+			}
+		}
+		else
+		{
+			val = arg;
+		}
+	};
+
+	for (int i = 1; i < argc; i++)
+	{
+		std::string arg = argv[i];
+		std::string key, val;
+		funcSplitArg(arg, key, val);
+		if (key.empty())
+			continue;
+
+		if (pystring::equal(key,	  "pdf1", true))
+			pdf1 = val;
+		else if (pystring::equal(key, "pdf2", true))
+			pdf2 = val;
+		else if (pystring::equal(key, "mode", true))
+			mode = val;
+		else if (pystring::equal(key, "left", true))
+			leftPdf = val;
+		else if (pystring::equal(key, "right", true))
+			rightPdf = val;
+		else if (pystring::equal(key, "merge", true))
+			mergePdf = val;
+		else if (pystring::equal(key, "onlytext", true))
+		{
+			if (compareType == 0)
+				compareType = 1;
+			else
+				std::cout << "已设置onlyshape，忽略onlytext" << std::endl;
+		}
+		else if (pystring::equal(key, "onlyshape", true))
+		{
+			if (compareType == 0)
+				compareType = 2;
+			else
+				std::cout << "已设置onlytext，忽略onlyshape" << std::endl;
+		}
+	}
+    
+	if (pdf1.empty() || pdf2.empty() || mode.empty())
+	{
+		funcUsage();
+		return 2;
+	}
+
+	if (leftPdf.empty())
+	{
+		std::string dir = os_path::dirname(pdf1);
+		leftPdf = os_path::join(dir, os_path::basename_no_ext(pdf1) + "_diff.pdf");
+	}
+	if (rightPdf.empty())
+	{
+		std::string dir = os_path::dirname(pdf2);
+		rightPdf = os_path::join(dir, os_path::basename_no_ext(pdf2) + "_diff.pdf");
+	}
+	if (mergePdf.empty())
+	{
+		std::string dir = os_path::dirname(pdf1);
+		mergePdf = os_path::join(dir, 
+			os_path::basename_no_ext(pdf1) + "_" + os_path::basename_no_ext(pdf2) + ".pdf");
+	}
+
+	if (pystring::equal(mode, "leftright", true))
+	{
+		CompareLeftRight(pdf1, pdf2, leftPdf, rightPdf, compareType);
+	}
+	else if (pystring::equal(mode, "merge", true))
+	{
+
 	}
 
     return 0;

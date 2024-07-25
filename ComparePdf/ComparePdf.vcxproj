@@ -139,10 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\pystring\pystring.cpp" />
     <ClCompile Include="ComparePdf.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PDFUCK\RTreeEx.h" />
+    <ClInclude Include="..\pystring\pystring.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

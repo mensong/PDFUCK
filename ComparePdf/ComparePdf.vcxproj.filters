@@ -18,9 +18,15 @@
     <ClCompile Include="ComparePdf.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\pystring\pystring.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PDFUCK\RTreeEx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pystring\pystring.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

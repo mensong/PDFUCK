@@ -100,11 +100,19 @@ public:
 		int height,
 		unsigned long color) = 0;
 
-	virtual void* GetBuffer() = 0;
+	virtual uint8_t* GetBuffer() = 0;
 	virtual int GetWidth() = 0;
 	virtual int GetHeight() = 0;
 	virtual int GetStride() = 0;
 	virtual int GetNumChannels() = 0;
+
+	virtual void ClearWidthColor(int R, int G, int B, int A) = 0;
+
+	virtual bool CopyFrom(PDF_BITMAP* src) = 0;
+	virtual bool ConvertFormat(FORMAT format) = 0;
+	
+	virtual uint32_t GetPixel(int x, int y) = 0;
+	virtual void SetPixel(int x, int y, int R, int G, int B, int A) = 0;
 
 	virtual bool WriteToFile(const char* filePath) = 0;
 };

@@ -102,12 +102,14 @@ void renderDiff(PDF_DOCUMENT* doc, PDF_PAGE* page, float left, float top, float 
 	float diffuse = 1.0;
 	auto rectObj = doc->NewRectPageObject(0 - diffuse, 0 - diffuse, 
 		right - left + diffuse * 2, top - bottom + diffuse * 2);
-	rectObj->SetFillColor(255, 0, 0, 20);
+	rectObj->SetFillColor(255, 0, 0, 50);
 	//rectObj->SetStrokeColor(255, 0, 0, 255);
 	rectObj->Transform(1, 0, 0, 1, left, bottom);
 	page->InsertPageObject(rectObj);
 	doc->ClosePageObject(&rectObj);
 }
+
+
 
 bool comparePageText(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* pageOther)
 {
@@ -218,6 +220,8 @@ bool comparePageText(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* pa
 	return pageHasDiff;
 }
 
+
+
 struct COMMON_STRING_INFO
 {
 	int pos1, pos2;
@@ -320,7 +324,7 @@ bool comparePageTextWithCommonString(PDF_DOCUMENT* doc1, PDF_PAGE* page1, PDF_DO
 
 
 
-bool comparePathPageObject(PDF_PAGEOBJECT* pathObj1, PDF_PAGEOBJECT* pathObj2)
+bool IsPathObjectSame(PDF_PAGEOBJECT* pathObj1, PDF_PAGEOBJECT* pathObj2)
 {
 	if (pathObj1->Path_IsClosed() != pathObj2->Path_IsClosed())
 		return false;
@@ -373,7 +377,45 @@ bool comparePathPageObject(PDF_PAGEOBJECT* pathObj1, PDF_PAGEOBJECT* pathObj2)
 	return true;
 }
 
-bool comparePagePaths(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* pageOther)
+bool IsImageObjectSame(PDF_PAGEOBJECT* imgObj1, PDF_PAGEOBJECT* imgObj2)
+{
+	unsigned long dataLen1 = imgObj1->Image_GetDataRaw(NULL, 0);
+	unsigned long dataLen2 = imgObj2->Image_GetDataRaw(NULL, 0);
+	if (dataLen1 != dataLen2)
+		return false;
+
+	byte* raw1 = new byte[dataLen1];
+	if (imgObj1->Image_GetDataRaw(raw1, dataLen1) != dataLen1)
+	{
+		delete[] raw1;
+		return false;
+	}
+	
+	byte* raw2 = new byte[dataLen2];
+	if (imgObj2->Image_GetDataRaw(raw2, dataLen2) != dataLen2)
+	{
+		delete[] raw1;
+		delete[] raw2;
+		return false;
+	}
+
+	bool isDiff = false;
+	for (size_t i = 0; i < dataLen1; i++)
+	{
+		if (raw1[i] != raw2[i])
+		{
+			isDiff = true;
+			break;
+		}
+	}
+
+	delete[] raw1;
+	delete[] raw2;
+
+	return !isDiff;
+}
+
+bool compareOtherObject(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* pageOther)
 {
 	bool pageHasDiff = false;
 	float left, bottom, right, top;
@@ -413,8 +455,9 @@ bool comparePagePaths(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* p
 	for (int i = 0; i < countObjsOther; i++)
 	{
 		auto pageObj = pageOther->OpenPageObject(i);
-		//只处理path
-		if (pageObj->GetType() == PDF_PAGEOBJ_PATH)
+		PDF_PAGE_OBJECT_TYPE objType = pageObj->GetType();
+		//只处理path/image
+		if (objType == PDF_PAGEOBJ_PATH || objType == PDF_PAGEOBJ_IMAGE)
 		{
 			rt->AppendPageObject(pageObj);
 			pageObjectsBuf.push_back(pageObj);
@@ -431,8 +474,9 @@ bool comparePagePaths(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* p
 	for (int i = 0; i < countObjsRender; i++)
 	{
 		auto pageObj = pageRender->OpenPageObject(i);
-		//只处理path
-		if (pageObj->GetType() == PDF_PAGEOBJ_PATH)
+		PDF_PAGE_OBJECT_TYPE objType = pageObj->GetType();
+		//处理path
+		if (objType == PDF_PAGEOBJ_PATH || objType == PDF_PAGEOBJ_IMAGE)
 		{
 			//auto countSegs = pageObj->Path_CountSegments();	
 			if (pageObj->GetBounds(&left, &bottom, &right, &top))
@@ -444,11 +488,23 @@ bool comparePagePaths(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* p
 				int searchCount = rt->SearchPageObjectsByAABBBox(minPos, maxPos, pageSearchedInOther, 5);
 				for (int se = 0; se < searchCount; se++)
 				{
-					if (comparePathPageObject(pageSearchedInOther[se], pageObj))
+					if (objType == PDF_PAGEOBJ_PATH)
 					{
-						isPathDiff = false;
-						break;
+						if (IsPathObjectSame(pageSearchedInOther[se], pageObj))
+						{
+							isPathDiff = false;
+							break;
+						}
 					}
+					else if (objType == PDF_PAGEOBJ_IMAGE)
+					{
+						if (IsImageObjectSame(pageSearchedInOther[se], pageObj))
+						{
+							isPathDiff = false;
+							break;
+						}
+					}
+
 				}
 
 				if (isPathDiff)
@@ -470,6 +526,8 @@ bool comparePagePaths(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* p
 
 	return pageHasDiff;
 }
+
+
 
 void CompareLeftRight(const std::string& pdf1, const std::string& pdf2, 
 	const std::string& leftPdf, const std::string& rightPdf, int compareType)
@@ -498,8 +556,8 @@ void CompareLeftRight(const std::string& pdf1, const std::string& pdf2,
 
 		if (compareType == 0 || compareType == 2)
 		{
-			page1PathHasDiff = comparePagePaths(doc1, page1, page2);
-			page2PathHasDiff = comparePagePaths(doc2, page2, page1);
+			page1PathHasDiff = compareOtherObject(doc1, page1, page2);
+			page2PathHasDiff = compareOtherObject(doc2, page2, page1);
 		}
 
         if (page1TextHasDiff || page1PathHasDiff)
@@ -517,6 +575,8 @@ void CompareLeftRight(const std::string& pdf1, const std::string& pdf2,
     PDFuck::Ins().CloseDocument(&doc1);
     PDFuck::Ins().CloseDocument(&doc2);
 }
+
+
 
 bool compareTextOverride(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* pageOther)
 {
@@ -566,87 +626,53 @@ bool compareTextOverride(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE
 	return isPageDiff;
 }
 
-void CompareOverride(const std::string& pdf1, const std::string&)
+void CompareOverride(const std::string& pdf1, const std::string& pdf2, const std::string& mergePdf, int compareType = 0)
 {
-	auto docMerge = PDFuck::Ins().LoadDocumentFromFile("shape1.pdf", NULL);
-	auto doc2 = PDFuck::Ins().LoadDocumentFromFile("shape2.pdf", NULL);
-
+	auto doc1 = PDFuck::Ins().LoadDocumentFromFile(pdf1.c_str(), NULL);
+	auto doc2 = PDFuck::Ins().LoadDocumentFromFile(pdf2.c_str(), NULL);
+	auto docMerge = PDFuck::Ins().CreateDocument();
 
 	docMerge->SetDefaultFontFilePath("simfang.ttf");
-	doc2->SetDefaultFontFilePath("simfang.ttf");
 
-	int countPages1 = docMerge->CountPages();
+	int countPages1 = doc1->CountPages();
 	int countPages2 = doc2->CountPages();
 
 	for (int i = 0; i < countPages1 && i < countPages2; i++)
 	{
-		auto page1 = docMerge->OpenPage(i);
-		auto page2 = docMerge->OpenPage(i + countPages1);
+		auto page1 = doc1->OpenPage(i);
+		auto page2 = doc2->OpenPage(i);
 
-		//对比文本
-		auto textPage1 = page1->OpenTextPage();
-		auto textPage2 = page2->OpenTextPage();
-		
+		int width = (int)page1->GetWidth();
+		int height = (int)page1->GetHeight();
 
+		auto bitmap1 = doc1->NewBitmap(width, height, true);
+		page1->RenderToBitmap(bitmap1, 0, 0, width, height, PDF_PAGE::PAGE_RATEION_0, 0);
+		auto bitmap2 = doc2->NewBitmap(width, height, true);
+		page2->RenderToBitmap(bitmap2, 0, 0, width, height, PDF_PAGE::PAGE_RATEION_0, 0);
 
-		page1->CloseTextPage(&textPage1);
-
-		int countPageObj1 = page1->CountPageObjects();
-
-		//把page2中的pageObject加到page1中
-		int countPageObj2 = page2->CountPageObjects();
-		for (int j = 0; j < countPageObj2; j++)
+		//bitmap1->ClearWidthColor(255, 0, 0, 255);
+		for (int x = 0; x < width; x++)
 		{
-			auto pageObj2 = page2->OpenPageObject(j);
-
-			auto pageObjCopy = pageObj2->Clone(docMerge, page1);
-			if (pageObjCopy)
+			for (int y = 0; y < height; y++)
 			{
-				float a, b, c, d, e, f;
-				auto t = pageObj2->GetType();
-				switch (t)
-				{
-				case PDF_PAGEOBJ_TEXT:
-					pageObj2->Text_GetMatrix(&a, &b, &c, &d, &e, &f);
-					pageObjCopy->Transform(a, b, c, d, e, f);
-					break;
-				case PDF_PAGEOBJ_PATH:
-					pageObj2->Path_GetMatrix(&a, &b, &c, &d, &e, &f);
-					pageObjCopy->Transform(a, b, c, d, e, f);
-					break;
-				case PDF_PAGEOBJ_IMAGE:
-					pageObjCopy->Image_GetMatrix(&a, &b, &c, &d, &e, &f);
-					pageObjCopy->Image_SetMatrix(a, b, c, d, e, f);
-					break;
-				case PDF_PAGEOBJ_SHADING:
-					break;
-				case PDF_PAGEOBJ_FORM:
-					break;
-				default:
-					break;
-				}
-
-
-				page1->InsertPageObject(pageObjCopy);
-				page1->ClosePageObject(&pageObjCopy);
+				bitmap1->SetPixel(x, y, 255, 0, 0, 100);
 			}
-			page2->ClosePageObject(&pageObj2);
 		}
+		bitmap1->WriteToFile((std::to_string(i) + ".png").c_str());
 
-		page1->CommitChange();
+		doc1->CloseBitmap(&bitmap1);
+		doc2->CloseBitmap(&bitmap2);
+
+		doc1->ClosePage(&page1);
+		doc2->ClosePage(&page2);
 	}
 
-	//删除导入的信息
-	for (int i = 0; i < countPages2; i++)
-	{
-		docMerge->DeletePage(docMerge->CountPages() - 1);
-	}
-
-	docMerge->SaveTo("merge.pdf", PDF_DOCUMENT::PDF_NO_INCREMENTAL);
+	docMerge->SaveTo(mergePdf.c_str(), PDF_DOCUMENT::PDF_NO_INCREMENTAL);
 
 	PDFuck::Ins().CloseDocument(&docMerge);
 	PDFuck::Ins().CloseDocument(&doc2);
 }
+
 
 int main(int argc, char** argv)
 {
@@ -770,6 +796,7 @@ int main(int argc, char** argv)
 	if (pystring::equal(mode, "leftright", true))
 	{
 		CompareLeftRight(pdf1, pdf2, leftPdf, rightPdf, compareType);
+		CompareOverride(pdf1, pdf2, "", 0);
 	}
 	else if (pystring::equal(mode, "merge", true))
 	{

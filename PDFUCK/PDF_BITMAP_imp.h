@@ -19,7 +19,7 @@ public:
 
 	virtual void FillRect(int left, int top, int width, int height, unsigned long color) override;
 
-	virtual void* GetBuffer() override;
+	virtual uint8_t* GetBuffer() override;
 
 	virtual int GetWidth() override;
 
@@ -34,6 +34,26 @@ public:
 
 	// 通过 PDF_BITMAP 继承
 	virtual int GetNumChannels() override;
+
+
+	// 通过 PDF_BITMAP 继承
+	virtual void ClearWidthColor(int R, int G, int B, int A) override;
+
+
+	// 通过 PDF_BITMAP 继承
+	virtual bool CopyFrom(PDF_BITMAP* src) override;
+
+
+	// 通过 PDF_BITMAP 继承
+	virtual bool ConvertFormat(FORMAT format) override;
+
+
+	// 通过 PDF_BITMAP 继承
+	virtual uint32_t GetPixel(int x, int y) override;
+
+
+	// 通过 PDF_BITMAP 继承
+	virtual void SetPixel(int x, int y, int R, int G, int B, int A) override;
 
 };
 

@@ -4,3 +4,6 @@
 [submodule "CtrlScale"]
 	path = CtrlScale
 	url = https://github.com/mensong/CtrlScale.git
+[submodule "pystring"]
+	path = pystring
+	url = https://github.com/mensong/pystring.git

@@ -206,9 +206,9 @@ bool PDF_DOCUMENT_imp::SaveTo(const char* filePath, SAVE_FLAG flag)
 	return res;
 }
 
-PDF_BITMAP* PDF_DOCUMENT_imp::NewBitmap(int width, int height, bool alpha)
+PDF_BITMAP* PDF_DOCUMENT_imp::NewBitmap(int width, int height)
 {
-	auto o = FPDFBitmap_Create(width, height, (int)alpha);
+	auto o = FPDFBitmap_Create(width, height, 1);
 	if (!o)
 		return NULL;
 	return new PDF_BITMAP_imp(o);

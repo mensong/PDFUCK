@@ -106,13 +106,13 @@ public:
 	virtual int GetStride() = 0;
 	virtual int GetNumChannels() = 0;
 
-	virtual void ClearWidthColor(int R, int G, int B, int A) = 0;
+	virtual void ClearWidthColor(uint8_t R, uint8_t G, uint8_t B, uint8_t A) = 0;
 
 	virtual bool CopyFrom(PDF_BITMAP* src) = 0;
 	virtual bool ConvertFormat(FORMAT format) = 0;
 	
-	virtual uint32_t GetPixel(int x, int y) = 0;
-	virtual void SetPixel(int x, int y, int R, int G, int B, int A) = 0;
+	virtual void SetPixel(int x, int y, uint8_t R, uint8_t G, uint8_t B, uint8_t A) = 0;
+	virtual void GetPixel(int x, int y, uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A) = 0;
 
 	virtual bool WriteToFile(const char* filePath) = 0;
 };
@@ -213,6 +213,10 @@ public:
 
 	virtual PDF_PAGE_OBJECT_TYPE GetType() = 0;
 	virtual bool HasTransparency() = 0;
+
+	/*
+	 * Doc/PDF_PAGEOBJECT-Transform.png
+	 */
 	virtual void Transform(
 		float a, float b,
 		float c, float d,
@@ -551,9 +555,9 @@ public:
 	virtual PDF_FONT* LoadStandardFont(const char* fontWithoutSpaces) = 0;
 	virtual void CloseFont(PDF_FONT** font) = 0;
 
+	virtual PDF_BITMAP* NewBitmap(int width, int height) = 0;
 	virtual PDF_BITMAP* NewBitmap(int width, int height, PDF_BITMAP::FORMAT format,
 		uint8_t* pBuffer = NULL, uint32_t pitch = 0) = 0;
-	virtual PDF_BITMAP* NewBitmap(int width, int height, bool alpha) = 0;
 	virtual void CloseBitmap(PDF_BITMAP** bitmap) = 0;
 
 	enum SAVE_FLAG

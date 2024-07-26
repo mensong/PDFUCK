@@ -153,7 +153,7 @@ int PDF_BITMAP_imp::GetNumChannels()
 	return -1;
 }
 
-void PDF_BITMAP_imp::ClearWidthColor(int R, int G, int B, int A)
+void PDF_BITMAP_imp::ClearWidthColor(uint8_t R, uint8_t G, uint8_t B, uint8_t A)
 {
 	uint32_t intColor = (A << 24) | (B << 16) | (G << 8) | R;
 
@@ -224,7 +224,7 @@ uint32_t PDF_BITMAP_imp::GetPixel(int x, int y)
 
 }
 
-void PDF_BITMAP_imp::SetPixel(int x, int y, int R, int G, int B, int A)
+void PDF_BITMAP_imp::SetPixel(int x, int y, uint8_t R, uint8_t G, uint8_t B, uint8_t A)
 {
 	int height = GetHeight();
 	int width = GetWidth();
@@ -297,5 +297,14 @@ void PDF_BITMAP_imp::SetPixel(int x, int y, int R, int G, int B, int A)
 	default:
 		break;
 	}
+}
+
+void PDF_BITMAP_imp::GetPixel(int x, int y, uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A)
+{
+	uint32_t color = GetPixel(x, y);
+	*A = FXARGB_A(color);
+	*B = (uint8_t)(color >> 16);
+	*G = (uint8_t)(color >> 8);
+	*R = (uint8_t)(color);
 }
 

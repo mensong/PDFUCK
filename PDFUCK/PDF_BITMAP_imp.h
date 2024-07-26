@@ -37,7 +37,7 @@ public:
 
 
 	// 通过 PDF_BITMAP 继承
-	virtual void ClearWidthColor(int R, int G, int B, int A) override;
+	virtual void ClearWidthColor(uint8_t R, uint8_t G, uint8_t B, uint8_t A) override;
 
 
 	// 通过 PDF_BITMAP 继承
@@ -47,13 +47,13 @@ public:
 	// 通过 PDF_BITMAP 继承
 	virtual bool ConvertFormat(FORMAT format) override;
 
+	// 通过 PDF_BITMAP 继承
+	virtual void SetPixel(int x, int y, uint8_t R, uint8_t G, uint8_t B, uint8_t A) override;
+
 
 	// 通过 PDF_BITMAP 继承
-	virtual uint32_t GetPixel(int x, int y) override;
-
-
-	// 通过 PDF_BITMAP 继承
-	virtual void SetPixel(int x, int y, int R, int G, int B, int A) override;
+	uint32_t GetPixel(int x, int y);
+	virtual void GetPixel(int x, int y, uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A) override;
 
 };
 

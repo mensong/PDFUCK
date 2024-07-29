@@ -10,6 +10,8 @@
 #include <cpdfsdk_helpers.h>
 #include <font/cpdf_font.h>
 #include <page/cpdf_textobject.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 bool PDF_DOCUMENT_imp::GetFileVersion(int* outVer)
 {
@@ -296,6 +298,15 @@ PDF_FONT* PDF_DOCUMENT_imp::LoadFontFromFile(const char* fontFilePath, PDF_FONT:
 	delete[] fontBuff;	
 
 	return font;
+}
+
+PDF_BITMAP* PDF_DOCUMENT_imp::ReadImage(const char* filePath)
+{
+	int width, height, channels;
+	unsigned char* imageData = stbi_load(filePath, &width, &height, &channels, 4);
+	if (imageData == NULL)
+		return NULL;
+	return NewBitmap(width, height, PDF_BITMAP::kArgb, imageData, 0);
 }
 
 PDF_BITMAP* PDF_DOCUMENT_imp::NewBitmap(int width, int height, PDF_BITMAP::FORMAT format,

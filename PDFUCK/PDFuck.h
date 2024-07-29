@@ -555,6 +555,7 @@ public:
 	virtual PDF_FONT* LoadStandardFont(const char* fontWithoutSpaces) = 0;
 	virtual void CloseFont(PDF_FONT** font) = 0;
 
+	virtual PDF_BITMAP* ReadImage(const char* filePath) = 0;
 	virtual PDF_BITMAP* NewBitmap(int width, int height) = 0;
 	virtual PDF_BITMAP* NewBitmap(int width, int height, PDF_BITMAP::FORMAT format,
 		uint8_t* pBuffer = NULL, uint32_t pitch = 0) = 0;

@@ -110,4 +110,7 @@ public:
 
 	// 通过 PDF_DOCUMENT 继承
 	virtual PDF_FONT* LoadFontFromFile(const char* fontFilePath, PDF_FONT::FONT_TYPE font_type, bool cid) override;
+
+	// 通过 PDF_DOCUMENT 继承
+	virtual PDF_BITMAP* ReadImage(const char* filePath);
 };

@@ -790,14 +790,14 @@ void testRender()
 		auto page = doc->OpenPage(i);
 
 		{
-			PDF_BITMAP* bitmap = doc->NewBitmap(800, 600, 1);
+			PDF_BITMAP* bitmap = doc->NewBitmap(800, 600);
 			page->RenderToBitmap(bitmap, 0, 0, 800, 600, PDF_PAGE::PAGE_RATEION_0, 0);
 			bitmap->WriteToFile("a.png");
 			doc->CloseBitmap(&bitmap);
 		}
 
 		{
-			PDF_BITMAP* bitmap = doc->NewBitmap(800, 600, 1);
+			PDF_BITMAP* bitmap = doc->NewBitmap(800, 600);
 			page->RenderToBitmapEx(bitmap, 
 				1, 0, 0, 1, 1, 1, 
 				100, 100, 400, 400, 
@@ -813,15 +813,69 @@ void testRender()
 	PDFuck::Ins().CloseDocument(&doc);
 }
 
+void testBitmap()
+{
+	auto doc = PDFuck::Ins().CreateDocument();
+
+	auto img = doc->NewBitmap(800, 600);
+	for (int i = 0; i < 800/2; i++)
+	{
+		for (int j = 0; j < 600/2; j++)
+		{
+			img->SetPixel(i, j, 0, 0, 255, 100);
+		}
+	}
+	img->WriteToFile("testBitmap.png");
+
+	auto img1 = doc->NewBitmap(800, 600);
+	for (int i = 0; i < 800; i++)
+	{
+		for (int j = 0; j < 600; j++)
+		{
+			uint8_t R, G, B, A;
+			img->GetPixel(i, j, &R, &G, &B, &A);
+			img1->SetPixel(i, j, R, G, B, A);
+		}
+	}
+	img1->WriteToFile("testBitmap1.png");
+
+	doc->CloseBitmap(&img);
+	doc->CloseBitmap(&img1);
+	PDFuck::Ins().CloseDocument(&doc);
+}
+
+void testLoadImage()
+{
+	auto doc = PDFuck::Ins().CreateDocument();
+
+	auto page = doc->NewPage(doc->CountPages(), 800, 600);
+
+	auto img = doc->ReadImage("u.jpg");
+	auto imgObj = doc->NewImagePageObject();
+	imgObj->Image_SetBitmap(img);
+	imgObj->Transform(200, 0, 0, 200, 120, 120);
+	page->InsertPageObject(imgObj);
+
+	doc->CloseBitmap(&img);
+
+	page->CommitChange();
+	doc->ClosePage(&page);
+
+	doc->SaveTo("u.pdf", PDF_DOCUMENT::PDF_NO_INCREMENTAL);
+	PDFuck::Ins().CloseDocument(&doc);
+}
+
 int main()
 {
 	std::wcout.imbue(std::locale("chs"));
 
-	testCreate();
+	//testCreate();
 	//testReadWriteText();
 	//testCompareLeftRight();
 	//testCompareOverride();
 	//testRender();
+	//testBitmap();
+	testLoadImage();
 
 	return 0;
 }

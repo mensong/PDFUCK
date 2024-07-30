@@ -822,7 +822,7 @@ void testBitmap()
 	{
 		for (int j = 0; j < 600/2; j++)
 		{
-			img->SetPixel(i, j, 0, 0, 255, 100);
+			img->SetPixel(i, j, 255, 0, 0, 100);
 		}
 	}
 	img->WriteToFile("testBitmap.png");
@@ -839,8 +839,20 @@ void testBitmap()
 	}
 	img1->WriteToFile("testBitmap1.png");
 
+	auto page = doc->NewPage(0, 800, 600);
+	auto imgObj1 = doc->NewImagePageObject();
+	imgObj1->Image_SetBitmap(img);
+	imgObj1->Transform(200, 0, 0, 200, 120, 120);
+	page->InsertPageObject(imgObj1);
+	doc->ClosePageObject(&imgObj1);
+	page->CommitChange();
+	doc->ClosePage(&page);
+
 	doc->CloseBitmap(&img);
 	doc->CloseBitmap(&img1);
+
+	doc->SaveTo("testBitmap.pdf", PDF_DOCUMENT::PDF_NO_INCREMENTAL);
+
 	PDFuck::Ins().CloseDocument(&doc);
 }
 
@@ -874,8 +886,8 @@ int main()
 	//testCompareLeftRight();
 	//testCompareOverride();
 	//testRender();
-	//testBitmap();
-	testLoadImage();
+	testBitmap();
+	//testLoadImage();
 
 	return 0;
 }

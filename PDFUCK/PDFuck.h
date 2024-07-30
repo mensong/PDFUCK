@@ -245,12 +245,12 @@ public:
 	};
 	virtual void SetBlendMode(BLEND_MODE bm) = 0;
 	
-	virtual bool SetStrokeColor(unsigned int R, unsigned int G, unsigned int B, unsigned int A) = 0;
-	virtual bool GetStrokeColor(unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) = 0;
+	virtual bool SetStrokeColor(uint8_t R, uint8_t G, uint8_t B, uint8_t A) = 0;
+	virtual bool GetStrokeColor(uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A) = 0;
 	virtual bool SetStrokeWidth(float width) = 0;
 	virtual bool GetStrokeWidth(float* width) = 0;
-	virtual bool SetFillColor(unsigned int R, unsigned int G, unsigned int B, unsigned int A) = 0;
-	virtual bool GetFillColor(unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) = 0;
+	virtual bool SetFillColor(uint8_t R, uint8_t G, uint8_t B, uint8_t A) = 0;
+	virtual bool GetFillColor(uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A) = 0;
 
 	enum PDF_LINEJOIN
 	{
@@ -379,8 +379,8 @@ public:
 	virtual unsigned long GetCharFontInfo(int index, char* bufferFontNameUtf8, unsigned long buflen, int* flags) = 0;
 	virtual int GetCharFontWeight(int index) = 0;
 	virtual PDF_TEXT_RENDERMODE GetCharTextRenderMode(int index) = 0;
-	virtual bool GetCharFillColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) = 0;
-	virtual bool GetCharStrokeColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) = 0;
+	virtual bool GetCharFillColor(int index, uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A) = 0;
+	virtual bool GetCharStrokeColor(int index, uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A) = 0;
 	virtual float GetCharAngle(int index) = 0;
 	virtual bool GetCharBox(int index, float* left, float* right, float* bottom, float* top) = 0;
 	virtual bool GetCharLooseCharBox(int index, float* left, float* right, float* bottom, float* top) = 0;

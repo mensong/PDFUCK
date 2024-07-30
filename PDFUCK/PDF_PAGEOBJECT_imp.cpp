@@ -118,13 +118,20 @@ void PDF_PAGEOBJECT_imp::SetBlendMode(BLEND_MODE bm)
 
 #undef CASE_TO_STR
 }
-bool PDF_PAGEOBJECT_imp::SetStrokeColor(unsigned int R, unsigned int G, unsigned int B, unsigned int A)
+bool PDF_PAGEOBJECT_imp::SetStrokeColor(uint8_t R, uint8_t G, uint8_t B, uint8_t A)
 {
 	return FPDFPageObj_SetStrokeColor(m_obj, R, G, B, A);
 }
-bool PDF_PAGEOBJECT_imp::GetStrokeColor(unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A)
+bool PDF_PAGEOBJECT_imp::GetStrokeColor(uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A)
 {
-	return FPDFPageObj_GetStrokeColor(m_obj, R, G, B, A);
+	unsigned int _R, _G, _B, _A;
+	if (!FPDFPageObj_GetStrokeColor(m_obj, &_R, &_G, &_B, &_A))
+		return false;
+	*R = _R;
+	*G = _G;
+	*B = _B;
+	*A = _A;
+	return true;
 }
 bool PDF_PAGEOBJECT_imp::SetStrokeWidth(float width)
 {
@@ -153,13 +160,20 @@ bool PDF_PAGEOBJECT_imp::SetLineCap(PDF_LINECAP line_cap)
 {
 	return FPDFPageObj_SetLineCap(m_obj, line_cap);
 }
-bool PDF_PAGEOBJECT_imp::SetFillColor(unsigned int R, unsigned int G, unsigned int B, unsigned int A)
+bool PDF_PAGEOBJECT_imp::SetFillColor(uint8_t R, uint8_t G, uint8_t B, uint8_t A)
 {
 	return FPDFPageObj_SetFillColor(m_obj, R, G, B, A);
 }
-bool PDF_PAGEOBJECT_imp::GetFillColor(unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A)
+bool PDF_PAGEOBJECT_imp::GetFillColor(uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A)
 {
-	return FPDFPageObj_GetFillColor(m_obj, R, G, B, A);
+	unsigned int _R, _G, _B, _A;
+	if (!FPDFPageObj_GetFillColor(m_obj, &_R, &_G, &_B, &_A))
+		return false;
+	*R = _R;
+	*G = _G;
+	*B = _B;
+	*A = _A;
+	return true;
 }
 bool PDF_PAGEOBJECT_imp::Image_SetBitmap(PDF_BITMAP* bitmap)
 {
@@ -395,7 +409,7 @@ PDF_PAGEOBJECT* PDF_PAGEOBJECT_imp::Clone(PDF_DOCUMENT* doc, PDF_PAGE* page)
 
 	auto funcFillCommon = [&]() 
 	{
-		unsigned int R, G, B, A;
+		uint8_t R, G, B, A;
 		if (this->GetFillColor(&R, &G, &B, &A))
 			newPageObj->SetFillColor(R, G, B, A);
 

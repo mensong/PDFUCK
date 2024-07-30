@@ -38,17 +38,17 @@ public:
 
 	virtual void SetBlendMode(BLEND_MODE bm) override;
 
-	virtual bool SetStrokeColor(unsigned int R, unsigned int G, unsigned int B, unsigned int A) override;
+	virtual bool SetStrokeColor(uint8_t R, uint8_t G, uint8_t B, uint8_t A) override;
 
-	virtual bool GetStrokeColor(unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) override;
+	virtual bool GetStrokeColor(uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A) override;
 
 	virtual bool SetStrokeWidth(float width) override;
 
 	virtual bool GetStrokeWidth(float* width) override;
 
-	virtual bool SetFillColor(unsigned int R, unsigned int G, unsigned int B, unsigned int A) override;
+	virtual bool SetFillColor(uint8_t R, uint8_t G, uint8_t B, uint8_t A) override;
 
-	virtual bool GetFillColor(unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) override;
+	virtual bool GetFillColor(uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A) override;
 
 	virtual PDF_LINEJOIN GetLineJoin() override;
 

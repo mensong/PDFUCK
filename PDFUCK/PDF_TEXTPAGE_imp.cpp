@@ -40,14 +40,28 @@ PDF_TEXT_RENDERMODE PDF_TEXTPAGE_imp::GetCharTextRenderMode(int index)
 	return (PDF_TEXT_RENDERMODE)FPDFText_GetTextRenderMode(m_textPage, index);
 }
 
-bool PDF_TEXTPAGE_imp::GetCharFillColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A)
+bool PDF_TEXTPAGE_imp::GetCharFillColor(int index, uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A)
 {
-	return FPDFText_GetFillColor(m_textPage, index, R, G, B, A);
+	unsigned int _R, _G, _B, _A;
+	if (!FPDFText_GetFillColor(m_textPage, index, &_R, &_G, &_B, &_A))
+		return false;
+	*R = _R;
+	*G = _G;
+	*B = _B;
+	*A = _A;
+	return true;
 }
 
-bool PDF_TEXTPAGE_imp::GetCharStrokeColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A)
+bool PDF_TEXTPAGE_imp::GetCharStrokeColor(int index, uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A)
 {
-	return FPDFText_GetStrokeColor(m_textPage, index, R, G, B, A);
+	unsigned int _R, _G, _B, _A;
+	if (!FPDFText_GetStrokeColor(m_textPage, index, &_R, &_G, &_B, &_A))
+		return false;
+	*R = _R;
+	*G = _G;
+	*B = _B;
+	*A = _A;
+	return true;
 }
 
 float PDF_TEXTPAGE_imp::GetCharAngle(int index)

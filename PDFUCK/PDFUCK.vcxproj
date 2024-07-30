@@ -88,6 +88,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)vs_pdfium\pdfium_lib\pdfium;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\public;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\fpdfsdk;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\core\fpdfapi;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\third_party\freetype\src\include;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\third_party\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -109,6 +110,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)vs_pdfium\pdfium_lib\pdfium;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\public;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\fpdfsdk;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\core\fpdfapi;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\third_party\freetype\src\include;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\third_party\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -130,6 +132,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)vs_pdfium\pdfium_lib\pdfium;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\public;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\fpdfsdk;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\core\fpdfapi;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\third_party\freetype\src\include;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\third_party\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -151,6 +154,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)vs_pdfium\pdfium_lib\pdfium;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\public;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\fpdfsdk;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\core\fpdfapi;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\third_party\freetype\src\include;$(SolutionDir)vs_pdfium\pdfium_lib\pdfium\third_party\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

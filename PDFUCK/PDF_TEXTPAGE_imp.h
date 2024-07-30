@@ -45,9 +45,9 @@ public:
 
 	virtual PDF_TEXT_RENDERMODE GetCharTextRenderMode(int index) override;
 
-	virtual bool GetCharFillColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) override;
+	virtual bool GetCharFillColor(int index, uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A) override;
 
-	virtual bool GetCharStrokeColor(int index, unsigned int* R, unsigned int* G, unsigned int* B, unsigned int* A) override;
+	virtual bool GetCharStrokeColor(int index, uint8_t* R, uint8_t* G, uint8_t* B, uint8_t* A) override;
 
 	virtual float GetCharAngle(int index) override;
 

@@ -578,52 +578,10 @@ void CompareLeftRight(const std::string& pdf1, const std::string& pdf2,
 
 
 
-bool compareTextOverride(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE* pageOther)
+float ColourDistance(uint8_t R1, uint8_t G1, uint8_t B1, uint8_t R2, uint8_t G2, uint8_t B2)
 {
-	bool isPageDiff = false;
-	float left, right, bottom, top;
-
-	auto textPageRender = pageRender->OpenTextPage();
-	auto textPageOther = pageRender->OpenTextPage();
-	auto rt = textPageRender->NewTextCharRTree();
-	rt->AppendTextPageAllChars();
-
-	int countCharsRender = textPageRender->CountChars();
-	for (int i = 0; i < countCharsRender; i++)
-	{
-		wchar_t c1 = textPageRender->GetChar(i);
-		if (!textPageRender->GetCharBox(i, &left, &right, &bottom, &top))
-			continue;
-
-		bool isDiff = true;
-		float minPos[2] = { left, bottom };
-		float maxPos[2] = { right, top };
-		int arrIndex[3];
-		int resultLen = rt->SearchCharIndexByAABBBox(minPos, maxPos, arrIndex, 3);
-		for (int r = 0; r < resultLen; r++)
-		{
-			wchar_t c2 = textPageOther->GetChar(arrIndex[r]);
-			if (c1 == c2)
-			{
-				isDiff = false;
-				break;
-			}
-		}
-
-		if (isDiff)
-		{
-			//textPage1->GetCharOrigin(i);
-			//textPage1->GetCharFontSize(i);
-			
-			isPageDiff = true;
-		}
-	}
-
-	textPageRender->CloseTextCharRTree(&rt);
-	pageRender->CloseTextPage(&textPageRender);
-	pageOther->CloseTextPage(&textPageOther);
-
-	return isPageDiff;
+	//return sqrtf(pow(R1 - R2, 2) + pow(G1 - G2, 2) + pow(B1 - B2, 2));
+	return abs(R1 - R2) + abs(G1 - G2) + abs(B1 - B2);
 }
 
 void CompareOverride(const std::string& pdf1, const std::string& pdf2, const std::string& mergePdf, int compareType = 0)
@@ -641,30 +599,133 @@ void CompareOverride(const std::string& pdf1, const std::string& pdf2, const std
 	{
 		auto page1 = doc1->OpenPage(i);
 		auto page2 = doc2->OpenPage(i);
+		
+		if (compareType == 1)
+		{//onlytext
+			int countObjs1 = page1->CountPageObjects();
+			for (int i = 0; i < countObjs1; i++)
+			{
+				auto pageObj = page1->OpenPageObject(i);
+				if (!pageObj)
+					continue;
+				if (pageObj->GetType() != PDF_PAGE_OBJECT_TYPE::PDF_PAGEOBJ_TEXT)
+				{
+					//page1->RemovePageObject(pageObj);
+					pageObj->SetFillColor(0, 0, 0, 0);
+					pageObj->SetStrokeColor(0, 0, 0, 0);
+				}
+				//doc1->DestroyUnmanagedPageObject(pageObj);
+				page1->ClosePageObject(&pageObj);
+			}
+
+			int countObjs2 = page2->CountPageObjects();
+			for (int i = 0; i < countObjs2; i++)
+			{
+				auto pageObj = page2->OpenPageObject(i);
+				if (!pageObj)
+					continue;
+				if (pageObj->GetType() != PDF_PAGE_OBJECT_TYPE::PDF_PAGEOBJ_TEXT)
+				{
+					//page1->RemovePageObject(pageObj);
+					pageObj->SetFillColor(0, 0, 0, 0);
+					pageObj->SetStrokeColor(0, 0, 0, 0);
+				}
+				//doc2->DestroyUnmanagedPageObject(pageObj);
+				page2->ClosePageObject(&pageObj);
+			}
+
+		}
+		else if (compareType == 2)
+		{//onlyshape
+			int countObjs1 = page1->CountPageObjects();
+			for (int i = 0; i < countObjs1; i++)
+			{
+				auto pageObj = page1->OpenPageObject(i);
+				if (!pageObj)
+					continue;
+				if (pageObj->GetType() == PDF_PAGE_OBJECT_TYPE::PDF_PAGEOBJ_TEXT)
+				{
+					//page1->RemovePageObject(pageObj);
+					pageObj->SetFillColor(0, 0, 0, 0);
+					pageObj->SetStrokeColor(0, 0, 0, 0);
+				}
+				//doc1->DestroyUnmanagedPageObject(pageObj);
+				page1->ClosePageObject(&pageObj);
+			}
+
+			int countObjs2 = page2->CountPageObjects();
+			for (int i = 0; i < countObjs2; i++)
+			{
+				auto pageObj = page2->OpenPageObject(i);
+				if (!pageObj)
+					continue;
+				if (pageObj->GetType() == PDF_PAGE_OBJECT_TYPE::PDF_PAGEOBJ_TEXT)
+				{
+					//page1->RemovePageObject(pageObj);
+					pageObj->SetFillColor(0, 0, 0, 0);
+					pageObj->SetStrokeColor(0, 0, 0, 0);
+				}
+				//doc2->DestroyUnmanagedPageObject(pageObj);
+				page2->ClosePageObject(&pageObj);
+			}
+
+		}
 
 		int width = (int)page1->GetWidth();
 		int height = (int)page1->GetHeight();
 
-		auto bitmap1 = doc1->NewBitmap(width, height, true);
-		page1->RenderToBitmap(bitmap1, 0, 0, width, height, PDF_PAGE::PAGE_RATEION_0, 0);
-		auto bitmap2 = doc2->NewBitmap(width, height, true);
-		page2->RenderToBitmap(bitmap2, 0, 0, width, height, PDF_PAGE::PAGE_RATEION_0, 0);
+		auto pageMerge = docMerge->NewPage(docMerge->CountPages(), width, height);
 
-		//bitmap1->ClearWidthColor(255, 0, 0, 255);
-		for (int x = 0; x < width; x++)
+		int imgWidth = width *3;
+		int imgHeight = height *3;
+
+		auto bitmap1 = doc1->NewBitmap(imgWidth, imgHeight);
+		page1->RenderToBitmap(bitmap1, 0, 0, imgWidth, imgHeight, PDF_PAGE::PAGE_RATEION_0, 0);
+		auto bitmap2 = doc2->NewBitmap(imgWidth, imgHeight);
+		page2->RenderToBitmap(bitmap2, 0, 0, imgWidth, imgHeight, PDF_PAGE::PAGE_RATEION_0, 0);
+		
+#ifdef _DEBUG
+		bitmap1->WriteToFile((std::to_string(i) + "_1.png").c_str());
+		bitmap2->WriteToFile((std::to_string(i) + "_2.png").c_str());
+#endif
+
+		auto bitmapMerge = docMerge->NewBitmap(imgWidth, imgHeight);
+
+		for (int h = 0; h < imgHeight; h++)
 		{
-			for (int y = 0; y < height; y++)
+			for (int w = 0; w < imgWidth; w++)
 			{
-				bitmap1->SetPixel(x, y, 255, 0, 0, 100);
+				uint8_t R1, G1, B1, A1;
+				bitmap1->GetPixel(w, h, &R1, &G1, &B1, &A1);
+				uint8_t R2, G2, B2, A2;
+				bitmap2->GetPixel(w, h, &R2, &G2, &B2, &A2);
+
+				//if (R1 != R2 || G1 != G2 || B1 != B2 || A1 != A2)
+				if (abs(A1 - A2) > 2 || ColourDistance(R1, G1, B1, R2, G2, B2) > 10)
+				{
+					bitmapMerge->SetPixel(w, h, 255, 0, 0, max(A1, A2)/* / 2.0f*/);
+				}
+				else
+				{
+					bitmapMerge->SetPixel(w, h, R1, G1, B1, A1);
+				}
 			}
 		}
-		bitmap1->WriteToFile((std::to_string(i) + ".png").c_str());
+
+		auto mergeImgObj = docMerge->NewImagePageObject();
+		mergeImgObj->Image_SetBitmap(bitmapMerge);
+		mergeImgObj->Transform(width, 0, 0, height, 0, 0);
+		pageMerge->InsertPageObject(mergeImgObj);
+		docMerge->ClosePageObject(&mergeImgObj);
+		docMerge->CloseBitmap(&bitmapMerge);
 
 		doc1->CloseBitmap(&bitmap1);
 		doc2->CloseBitmap(&bitmap2);
 
 		doc1->ClosePage(&page1);
 		doc2->ClosePage(&page2);
+		pageMerge->CommitChange();
+		docMerge->ClosePage(&pageMerge);
 	}
 
 	docMerge->SaveTo(mergePdf.c_str(), PDF_DOCUMENT::PDF_NO_INCREMENTAL);
@@ -691,25 +752,28 @@ int main(int argc, char** argv)
 	//}
 	//return 0;
 
+	float cd = ColourDistance(255, 255, 255, 0, 0, 0);
+	cd = ColourDistance(254, 101, 0, 255, 100, 0);
+	cd = ColourDistance(255, 0, 0, 253, 0, 0);
+	cd = ColourDistance(255, 0, 0, 0, 255, 0);
+
 	auto funcUsage = []()
 	{
 		std::cout << "Usage:" 
-			<< " -pdf1=pdf1" 
-			<< " -pdf2=pdf2" 
-			<< " -mode=leftright/merge"
-			<< " -left=leftPdf" 
-			<< " -right=rightPdf" 
-			<< " -merge=mergePdf" 
+			<< " -in_pdf1=pdf1" 
+			<< " -in_pdf2=pdf2"
+			<< " -out_left=leftPdf" 
+			<< " -out_right=rightPdf" 
+			<< " -out_merge=mergePdf" 
 			<< " -onlytext"
 			<< " -onlyshape"
 			<< std::endl;
 	};
 
-	std::string pdf1;
-	std::string pdf2;
-	std::string mode;
-	std::string leftPdf, rightPdf;
-	std::string mergePdf;
+	std::string in_pdf1;
+	std::string in_pdf2;
+	std::string out_left, out_right;
+	std::string out_merge;
 	int compareType = 0;//0:全部；1:仅文本；2:仅图形
 
 	auto funcSplitArg = [](const std::string& arg, std::string& key, std::string& val)->void
@@ -742,18 +806,16 @@ int main(int argc, char** argv)
 		if (key.empty())
 			continue;
 
-		if (pystring::equal(key,	  "pdf1", true))
-			pdf1 = val;
-		else if (pystring::equal(key, "pdf2", true))
-			pdf2 = val;
-		else if (pystring::equal(key, "mode", true))
-			mode = val;
-		else if (pystring::equal(key, "left", true))
-			leftPdf = val;
-		else if (pystring::equal(key, "right", true))
-			rightPdf = val;
-		else if (pystring::equal(key, "merge", true))
-			mergePdf = val;
+		if (pystring::equal(key,	  "in_pdf1", true))
+			in_pdf1 = val;
+		else if (pystring::equal(key, "in_pdf2", true))
+			in_pdf2 = val;
+		else if (pystring::equal(key, "out_left", true))
+			out_left = val;
+		else if (pystring::equal(key, "out_right", true))
+			out_right = val;
+		else if (pystring::equal(key, "out_merge", true))
+			out_merge = val;
 		else if (pystring::equal(key, "onlytext", true))
 		{
 			if (compareType == 0)
@@ -770,37 +832,19 @@ int main(int argc, char** argv)
 		}
 	}
     
-	if (pdf1.empty() || pdf2.empty() || mode.empty())
+	if (in_pdf1.empty() || in_pdf2.empty())
 	{
 		funcUsage();
 		return 2;
 	}
 
-	if (leftPdf.empty())
+	if (!pystring::iscempty(out_left) && !pystring::iscempty(out_right))
 	{
-		std::string dir = os_path::dirname(pdf1);
-		leftPdf = os_path::join(dir, os_path::basename_no_ext(pdf1) + "_diff.pdf");
+		CompareLeftRight(in_pdf1, in_pdf2, out_left, out_right, compareType);
 	}
-	if (rightPdf.empty())
+	else if (!pystring::iscempty(out_merge))
 	{
-		std::string dir = os_path::dirname(pdf2);
-		rightPdf = os_path::join(dir, os_path::basename_no_ext(pdf2) + "_diff.pdf");
-	}
-	if (mergePdf.empty())
-	{
-		std::string dir = os_path::dirname(pdf1);
-		mergePdf = os_path::join(dir, 
-			os_path::basename_no_ext(pdf1) + "_" + os_path::basename_no_ext(pdf2) + ".pdf");
-	}
-
-	if (pystring::equal(mode, "leftright", true))
-	{
-		CompareLeftRight(pdf1, pdf2, leftPdf, rightPdf, compareType);
-		CompareOverride(pdf1, pdf2, "", 0);
-	}
-	else if (pystring::equal(mode, "merge", true))
-	{
-
+		CompareOverride(in_pdf1, in_pdf2, out_merge, compareType);
 	}
 
     return 0;

@@ -1,0 +1,1 @@
+..\x64\Release\ComparePdf.exe -in_pdf1=shape1.pdf -in_pdf2=shape2.pdf -out_left=left.pdf -out_right=right.pdf -out_merge=merge.pdf

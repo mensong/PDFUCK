@@ -455,6 +455,26 @@ bool compareOtherObject(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE*
 	for (int i = 0; i < countObjsOther; i++)
 	{
 		auto pageObj = pageOther->OpenPageObject(i);
+		if (!pageObj)
+			continue;
+
+		//过滤掉透明的实体
+		uint8_t R, G, B, A;
+		if (pageObj->GetFillColor(&R, &G, &B, &A))
+		{
+			if (A == 0)
+			{
+				if (pageObj->GetStrokeColor(&R, &G, &B, &A))
+				{
+					if (A == 0)
+					{
+						pageOther->ClosePageObject(&pageObj);
+						continue;
+					}
+				}
+			}
+		}
+
 		PDF_PAGE_OBJECT_TYPE objType = pageObj->GetType();
 		//只处理path/image
 		if (objType == PDF_PAGEOBJ_PATH || objType == PDF_PAGEOBJ_IMAGE)
@@ -474,6 +494,26 @@ bool compareOtherObject(PDF_DOCUMENT* docRender, PDF_PAGE* pageRender, PDF_PAGE*
 	for (int i = 0; i < countObjsRender; i++)
 	{
 		auto pageObj = pageRender->OpenPageObject(i);
+		if (!pageObj)
+			continue;
+
+		//过滤掉透明的实体
+		uint8_t R, G, B, A;
+		if (pageObj->GetFillColor(&R, &G, &B, &A))
+		{
+			if (A == 0)
+			{
+				if (pageObj->GetStrokeColor(&R, &G, &B, &A))
+				{
+					if (A == 0)
+					{
+						pageRender->ClosePageObject(&pageObj);
+						continue;
+					}
+				}
+			}
+		}
+
 		PDF_PAGE_OBJECT_TYPE objType = pageObj->GetType();
 		//处理path
 		if (objType == PDF_PAGEOBJ_PATH || objType == PDF_PAGEOBJ_IMAGE)
@@ -842,7 +882,7 @@ int main(int argc, char** argv)
 	{
 		CompareLeftRight(in_pdf1, in_pdf2, out_left, out_right, compareType);
 	}
-	else if (!pystring::iscempty(out_merge))
+	if (!pystring::iscempty(out_merge))
 	{
 		CompareOverride(in_pdf1, in_pdf2, out_merge, compareType);
 	}

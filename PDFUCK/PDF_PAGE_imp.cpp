@@ -4,8 +4,10 @@
 #include "PDF_PAGEOBJECT_imp.h"
 #include "PDF_TEXTPAGE_imp.h"
 #include "PDF_PAGEOBJECT_RTREE_imp.h"
+#include "PDF_CLIPPATH_imp.h"
 #include <fpdf_edit.h>
 #include <cpdfsdk_helpers.h>
+#include <fpdf_transformpage.h>
 
 
 // 通过 PDF_PAGE 继承
@@ -81,6 +83,103 @@ void PDF_PAGE_imp::CloseRTree(PDF_PAGEOBJECT_RTREE** rt)
 {
 	delete IMP(PDF_PAGEOBJECT_RTREE, *rt);
 	*rt = NULL;
+}
+
+void PDF_PAGE_imp::SetMediaBox(float left, float bottom, float right, float top)
+{
+	FPDFPage_SetMediaBox(m_page, left, bottom, right, top);
+}
+
+void PDF_PAGE_imp::SetCropBox(float left, float bottom, float right, float top)
+{
+	FPDFPage_SetCropBox(m_page, left, bottom, right, top);
+}
+
+void PDF_PAGE_imp::SetBleedBox(float left, float bottom, float right, float top)
+{
+	FPDFPage_SetBleedBox(m_page, left, bottom, right, top);
+}
+
+void PDF_PAGE_imp::SetTrimBox(float left, float bottom, float right, float top)
+{
+	FPDFPage_SetTrimBox(m_page, left, bottom, right, top);
+}
+
+void PDF_PAGE_imp::SetArtBox(float left, float bottom, float right, float top)
+{
+	FPDFPage_SetArtBox(m_page, left, bottom, right, top);
+}
+
+bool PDF_PAGE_imp::GetMediaBox(float* left, float* bottom, float* right, float* top)
+{
+	return FPDFPage_GetMediaBox(m_page, left, bottom, right, top);
+}
+
+bool PDF_PAGE_imp::GetCropBox(float* left, float* bottom, float* right, float* top)
+{
+	return FPDFPage_GetCropBox(m_page, left, bottom, right, top);
+}
+
+bool PDF_PAGE_imp::GetBleedBox(float* left, float* bottom, float* right, float* top)
+{
+	return FPDFPage_GetBleedBox(m_page, left, bottom, right, top);
+}
+
+bool PDF_PAGE_imp::GetTrimBox(float* left, float* bottom, float* right, float* top)
+{
+	return FPDFPage_GetTrimBox(m_page, left, bottom, right, top);
+}
+
+bool PDF_PAGE_imp::GetArtBox(float* left, float* bottom, float* right, float* top)
+{
+	return FPDFPage_GetArtBox(m_page, left, bottom, right, top);
+}
+
+bool PDF_PAGE_imp::TransformWithClip(const PDF_MATRIX* matrix, const PDF_RECT* clipRect)
+{
+	FS_MATRIX mat;
+	FS_RECTF rect;
+	FS_MATRIX* pMap = NULL;
+	FS_RECTF* pRect = NULL;
+	if (matrix)
+	{
+		mat.a = matrix->a;
+		mat.b = matrix->b;
+		mat.c = matrix->c;
+		mat.d = matrix->d;
+		mat.e = matrix->e;
+		mat.f = matrix->f;
+		pMap = &mat;
+	}
+	if (clipRect)
+	{
+		rect.left = clipRect->left;
+		rect.right = clipRect->right;
+		rect.bottom = clipRect->bottom;
+		rect.top = clipRect->top;
+		pRect = &rect;
+	}
+
+	return FPDFPage_TransFormWithClip(m_page, pMap, pRect);
+}
+
+PDF_CLIPPATH* PDF_PAGE_imp::CreateClipPath(float left, float bottom, float right, float top)
+{
+	auto o = FPDF_CreateClipPath(left, bottom, right, top);
+	if (!o)
+		return NULL;
+	return new PDF_CLIPPATH_imp(o);
+}
+
+void PDF_PAGE_imp::InsertClipPath(PDF_CLIPPATH* clipPath)
+{
+	FPDFPage_InsertClipPath(m_page, IMP(PDF_CLIPPATH, clipPath)->m_clipPath);
+}
+
+void PDF_PAGE_imp::CloseClipPath(PDF_CLIPPATH** clipPath)
+{
+	delete IMP(PDF_CLIPPATH, *clipPath);
+	*clipPath = NULL;
 }
 
 // 通过 PDF_PAGE 继承

@@ -3,6 +3,7 @@
 #include "PDF_FINDER_imp.h"
 #include "PDF_PAGELINK_imp.h"
 #include "PDF_TEXTCHAR_RTREE_imp.h"
+#include <fpdf_searchex.h>
 
 // Í¨¹ý PDF_TEXTPAGE ¼Ì³Ð
 int PDF_TEXTPAGE_imp::CountChars()
@@ -187,4 +188,14 @@ void PDF_TEXTPAGE_imp::CloseTextCharRTree(PDF_TEXTCHAR_RTREE** rt)
 {
 	delete IMP(PDF_TEXTCHAR_RTREE, *rt);
 	*rt = NULL;
+}
+
+int PDF_TEXTPAGE_imp::GetCharIndexFromTextIndex(int nTextIndex)
+{
+	return FPDFText_GetCharIndexFromTextIndex(m_textPage, nTextIndex);
+}
+
+int PDF_TEXTPAGE_imp::GetTextIndexFromCharIndex(int nCharIndex)
+{
+	return FPDFText_GetTextIndexFromCharIndex(m_textPage, nCharIndex);
 }

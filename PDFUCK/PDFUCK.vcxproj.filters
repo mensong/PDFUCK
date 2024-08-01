@@ -69,6 +69,9 @@
     <ClInclude Include="stb_image_write.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="PDF_CLIPPATH_imp.h">
+      <Filter>IMP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -114,6 +117,9 @@
       <Filter>IMP</Filter>
     </ClCompile>
     <ClCompile Include="PDF_TEXTCHAR_RTREE_imp.cpp">
+      <Filter>IMP</Filter>
+    </ClCompile>
+    <ClCompile Include="PDF_CLIPPATH_imp.cpp">
       <Filter>IMP</Filter>
     </ClCompile>
   </ItemGroup>

@@ -75,6 +75,40 @@ public:
 
 	virtual void CloseRTree(PDF_PAGEOBJECT_RTREE** rt) override;
 
+
+	// 通过 PDF_PAGE 继承
+	virtual void SetMediaBox(float left, float bottom, float right, float top) override;
+
+	virtual void SetCropBox(float left, float bottom, float right, float top) override;
+
+	virtual void SetBleedBox(float left, float bottom, float right, float top) override;
+
+	virtual void SetTrimBox(float left, float bottom, float right, float top) override;
+
+	virtual void SetArtBox(float left, float bottom, float right, float top) override;
+
+	virtual bool GetMediaBox(float* left, float* bottom, float* right, float* top) override;
+
+	virtual bool GetCropBox(float* left, float* bottom, float* right, float* top) override;
+
+	virtual bool GetBleedBox(float* left, float* bottom, float* right, float* top) override;
+
+	virtual bool GetTrimBox(float* left, float* bottom, float* right, float* top) override;
+
+	virtual bool GetArtBox(float* left, float* bottom, float* right, float* top) override;
+
+
+	// 通过 PDF_PAGE 继承
+	virtual bool TransformWithClip(const PDF_MATRIX* matrix, const PDF_RECT* clipRect) override;
+	
+
+	// 通过 PDF_PAGE 继承
+	virtual PDF_CLIPPATH* CreateClipPath(float left, float bottom, float right, float top) override;
+
+	virtual void InsertClipPath(PDF_CLIPPATH* clipPath) override;
+
+	virtual void CloseClipPath(PDF_CLIPPATH** clipPath) override;
+
 };
 
 

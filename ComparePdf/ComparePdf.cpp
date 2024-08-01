@@ -617,7 +617,6 @@ void CompareLeftRight(const std::string& pdf1, const std::string& pdf2,
 }
 
 
-
 float ColourDistance(uint8_t R1, uint8_t G1, uint8_t B1, uint8_t R2, uint8_t G2, uint8_t B2)
 {
 	//return sqrtf(pow(R1 - R2, 2) + pow(G1 - G2, 2) + pow(B1 - B2, 2));
@@ -743,7 +742,7 @@ void CompareOverride(const std::string& pdf1, const std::string& pdf2, const std
 				//if (R1 != R2 || G1 != G2 || B1 != B2 || A1 != A2)
 				if (abs(A1 - A2) > 2 || ColourDistance(R1, G1, B1, R2, G2, B2) > 10)
 				{
-					bitmapMerge->SetPixel(w, h, 255, 0, 0, max(A1, A2)/* / 2.0f*/);
+					bitmapMerge->SetPixel(w, h, 255, 0, 0, /*max(A1, A2)*/(A1 + A2) / 2.0f);
 				}
 				else
 				{

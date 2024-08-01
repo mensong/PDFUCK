@@ -27,7 +27,7 @@ public:
 
 	}
 		
-	// 通过 PDF_PAGEOBJECT 继承
+	
 	virtual PDF_PAGE_OBJECT_TYPE GetType() override;
 
 	virtual bool HasTransparency() override;
@@ -133,19 +133,30 @@ public:
 	virtual float Text_CalcCharWidth(PDF_FONT* font, wchar_t c) override;
 
 
-	// 通过 PDF_PAGEOBJECT 继承
+	
 	virtual void CloseFormObject(PDF_PAGEOBJECT** formObj) override;
 
 
-	// 通过 PDF_PAGEOBJECT 继承
+	
 	virtual void Path_CloseSegment(PDF_PATHSEGMENT** segment) override;
 
 
-	// 通过 PDF_PAGEOBJECT 继承
+	
 	virtual bool Path_IsClosed() override;
 
 
-	// 通过 PDF_PAGEOBJECT 继承
+	
 	virtual PDF_PAGEOBJECT* Clone(PDF_DOCUMENT* doc, PDF_PAGE* page) override;
+
+
+	
+	virtual void TransformClipPath(
+		float a, float b,
+		float c, float d,
+		float e, float f) override;
+
+	virtual PDF_CLIPPATH* OpenClipPath() override;
+
+	virtual void CloseClipPath(PDF_CLIPPATH** clipPath) override;
 
 };

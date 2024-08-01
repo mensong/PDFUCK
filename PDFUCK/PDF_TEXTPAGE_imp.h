@@ -81,5 +81,11 @@ public:
 
 	virtual void CloseTextCharRTree(PDF_TEXTCHAR_RTREE** rt) override;
 
+
+	// Í¨¹ý PDF_TEXTPAGE ¼Ì³Ð
+	virtual int GetCharIndexFromTextIndex(int nTextIndex) override;
+
+	virtual int GetTextIndexFromCharIndex(int nCharIndex) override;
+
 };
 

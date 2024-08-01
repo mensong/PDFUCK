@@ -11,9 +11,11 @@
 #include "PDF_DOCUMENT_imp.h"
 #include "PDF_PAGE_imp.h"
 #include "PDF_PATHSEGMENT_imp.h"
+#include "PDF_CLIPPATH_imp.h"
 #include <fpdf_editpath.cpp>
+#include <fpdf_transformpage.h>
 
-// Í¨¹ý PDF_PAGEOBJECT ¼Ì³Ð
+
 bool PDF_PAGEOBJECT_imp::HasTransparency()
 {
 	return FPDFPageObj_HasTransparency(m_obj);
@@ -523,5 +525,27 @@ PDF_PAGEOBJECT* PDF_PAGEOBJECT_imp::Clone(PDF_DOCUMENT* doc, PDF_PAGE* page)
 	}
 	
 	return newPageObj;
+}
+
+void PDF_PAGEOBJECT_imp::TransformClipPath(
+	float a, float b,
+	float c, float d,
+	float e, float f)
+{
+	FPDFPageObj_TransformClipPath(m_obj, a, b, c, d, e, f);
+}
+
+PDF_CLIPPATH* PDF_PAGEOBJECT_imp::OpenClipPath()
+{
+	auto o = FPDFPageObj_GetClipPath(m_obj);
+	if (!o)
+		return NULL;
+	return new PDF_CLIPPATH_imp(o);
+}
+
+void PDF_PAGEOBJECT_imp::CloseClipPath(PDF_CLIPPATH** clipPath)
+{
+	delete IMP(PDF_CLIPPATH, *clipPath);
+	*clipPath = NULL;
 }
 

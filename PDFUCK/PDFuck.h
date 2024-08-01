@@ -22,6 +22,35 @@ class PDF_PAGEOBJECT;
 class PDF_PAGE;
 class PDF_DOCUMENT;
 
+// Matrix for transformation, in the form [a b c d e f], equivalent to:
+// | a  b  0 |
+// | c  d  0 |
+// | e  f  1 |
+//
+// Translation is performed with [1 0 0 1 tx ty].
+// Scaling is performed with [sx 0 0 sy 0 0].
+// See PDF Reference 1.7, 4.2.2 Common Transformations for more.
+typedef struct _PDF_MATRIX_ {
+	float a;
+	float b;
+	float c;
+	float d;
+	float e;
+	float f;
+} PDF_MATRIX;
+
+// Rectangle area(float) in device or page coordinate system.
+typedef struct _PDF_RECTF_ {
+	// The x-coordinate of the left-top corner.
+	float left;
+	// The y-coordinate of the left-top corner.
+	float top;
+	// The x-coordinate of the right-bottom corner.
+	float right;
+	// The y-coordinate of the right-bottom corner.
+	float bottom;
+} PDF_RECT;
+
 enum PDF_OBJECT_TYPE
 {
 	PDF_OBJECT_UNKNOWN = 0,
@@ -206,6 +235,15 @@ public:
 
 };
 
+class PDF_CLIPPATH
+{
+public:
+	virtual int CountPaths() = 0;
+	virtual int CountPathSegments(int path_index) = 0;
+	virtual PDF_PATHSEGMENT* OpenPathSegment(int path_index, int segment_index) = 0;
+	virtual void ClosePathSegment(PDF_PATHSEGMENT** pathSegment) = 0;
+};
+
 class PDF_PAGEOBJECT
 {
 public:
@@ -350,6 +388,13 @@ public:
 	virtual PDF_PAGEOBJECTMARK* AddMark(const char* tag) = 0;
 	virtual bool RemoveMark(PDF_PAGEOBJECTMARK* mark) = 0;
 	virtual void CloseMark(PDF_PAGEOBJECTMARK** mark) = 0;
+
+	virtual void TransformClipPath(
+		float a, float b,
+		float c, float d,
+		float e, float f) = 0;
+	virtual PDF_CLIPPATH* OpenClipPath() = 0;
+	virtual void CloseClipPath(PDF_CLIPPATH** clipPath) = 0;
 };
 
 class PDF_PAGEOBJECT_RTREE
@@ -390,6 +435,8 @@ public:
 		float* e, float* f) = 0;
 	virtual bool GetCharOrigin(int index, float* x, float* y) = 0;
 
+	virtual int GetCharIndexFromTextIndex(int nTextIndex) = 0;
+	virtual int GetTextIndexFromCharIndex(int nCharIndex) = 0;
 	virtual int GetText(int start_index, int count, wchar_t* resultBuff) = 0;
 
 	virtual int CountRects(int start_index = 0, int count = 0) = 0;
@@ -457,6 +504,23 @@ public:
 
 	virtual PDF_PAGEOBJECT_RTREE* NewRTree() = 0;
 	virtual void CloseRTree(PDF_PAGEOBJECT_RTREE** rt) = 0;
+
+	virtual void SetMediaBox(float left, float bottom, float right, float top) = 0;
+	virtual void SetCropBox(float left, float bottom, float right, float top) = 0;
+	virtual void SetBleedBox(float left, float bottom, float right, float top) = 0;
+	virtual void SetTrimBox(float left, float bottom, float right, float top) = 0;
+	virtual void SetArtBox(float left, float bottom, float right, float top) = 0;
+	virtual bool GetMediaBox(float* left, float* bottom, float* right, float* top) = 0;
+	virtual bool GetCropBox(float* left, float* bottom, float* right, float* top) = 0;
+	virtual bool GetBleedBox(float* left, float* bottom, float* right, float* top) = 0;
+	virtual bool GetTrimBox(float* left, float* bottom, float* right, float* top) = 0;
+	virtual bool GetArtBox(float* left, float* bottom, float* right, float* top) = 0;
+
+	virtual bool TransformWithClip(const PDF_MATRIX* matrix, const PDF_RECT* clipRect) = 0;
+
+	virtual PDF_CLIPPATH* CreateClipPath(float left, float bottom, float right, float top) = 0;
+	virtual void InsertClipPath(PDF_CLIPPATH* clipPath) = 0;
+	virtual void CloseClipPath(PDF_CLIPPATH** clipPath) = 0;
 
 	enum RENDER_FLAGS
 	{

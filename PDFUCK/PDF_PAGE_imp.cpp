@@ -9,8 +9,9 @@
 #include <cpdfsdk_helpers.h>
 #include <fpdf_transformpage.h>
 
+#pragma comment(lib, "Msimg32.lib")
 
-// 通过 PDF_PAGE 继承
+
 float PDF_PAGE_imp::GetWidth()
 {
 	//PAGE_RATEION rotate = GetRotation();
@@ -24,7 +25,7 @@ float PDF_PAGE_imp::GetWidth()
 }
 
 
-// 通过 PDF_PAGE 继承
+
 float PDF_PAGE_imp::GetHeight()
 {
 	//int rotate = GetRotation();
@@ -37,12 +38,41 @@ float PDF_PAGE_imp::GetHeight()
 	return FPDF_GetPageHeight(m_page);
 }
 
-
-// 通过 PDF_PAGE 继承
 void PDF_PAGE_imp::RenderToDC(HDC dc,
 	int x_inDC, int y_inDC, int size_x_inDC, int size_y_inDC, PAGE_RATEION rotate_inDC, int flags)
 {
 	FPDF_RenderPage(dc, m_page, x_inDC, y_inDC, size_x_inDC, size_y_inDC, rotate_inDC, flags);
+}
+
+void PDF_PAGE_imp::RenderToDC_DoubleBuffer(HDC dc, int x_inDC, int y_inDC, int size_x_inDC, int size_y_inDC,
+	PAGE_RATEION rotate_inDC, COLORREF colorTransparent, int flags)
+{
+	HDC hBufferDC = CreateCompatibleDC(dc);
+	HBITMAP hBitmap = CreateCompatibleBitmap(dc, size_x_inDC, size_y_inDC);
+	SelectObject(hBufferDC, hBitmap);
+
+	// 绘制背景
+	HBRUSH hBrush = CreateSolidBrush(colorTransparent);
+	//SelectObject(hBufferDC, hBrush);
+	RECT rc;
+	rc.left = 0;
+	rc.top = 0;
+	rc.right = size_x_inDC;
+	rc.bottom = size_y_inDC;
+	::FillRect(hBufferDC, &rc, hBrush);
+	//::Rectangle(hBufferDC, 0, 0, size_x_inDC, size_y_inDC);
+
+	//绘制pdf内容
+	FPDF_RenderPage(hBufferDC, m_page, 0, 0, size_x_inDC, size_y_inDC, rotate_inDC, flags);
+
+	//double buffer拷贝
+	//BitBlt(dc, x_inDC, y_inDC,  size_x_inDC, size_y_inDC, hBufferDC, 0, 0, SRCCOPY);
+	TransparentBlt(dc, x_inDC, y_inDC, size_x_inDC, size_y_inDC,
+		hBufferDC, 0, 0, size_x_inDC, size_y_inDC, colorTransparent);
+
+	DeleteObject(hBrush);
+	DeleteObject(hBitmap);
+	DeleteDC(hBufferDC);
 }
 
 void PDF_PAGE_imp::RenderToBitmap(PDF_BITMAP* bitmap,
@@ -182,7 +212,6 @@ void PDF_PAGE_imp::CloseClipPath(PDF_CLIPPATH** clipPath)
 	*clipPath = NULL;
 }
 
-// 通过 PDF_PAGE 继承
 PDF_PAGE::PAGE_RATEION PDF_PAGE_imp::GetRotation()
 {
 	return (PAGE_RATEION)FPDFPage_GetRotation(m_page);
@@ -229,7 +258,7 @@ void PDF_PAGE_imp::ClosePageObject(PDF_PAGEOBJECT** pageObj)
 	*pageObj = NULL;
 }
 
-// 通过 PDF_PAGE 继承
+
 bool PDF_PAGE_imp::RemovePageObject(PDF_PAGEOBJECT* pageObj)
 {
 	return FPDFPage_RemoveObject(m_page, IMP(PDF_PAGEOBJECT, pageObj)->m_obj);
@@ -251,7 +280,7 @@ void PDF_PAGE_imp::CloseTextPage(PDF_TEXTPAGE** text_page)
 }
 
 
-// 通过 PDF_PAGE 继承
+
 bool PDF_PAGE_imp::GetBoundingBox(float* left, float* top, float* right, float* bottom)
 {
 	FS_RECTF rect;
@@ -266,7 +295,7 @@ bool PDF_PAGE_imp::GetBoundingBox(float* left, float* top, float* right, float* 
 }
 
 
-// 通过 PDF_PAGE 继承
+
 bool PDF_PAGE_imp::CommitChange()
 {
 	return FPDFPage_GenerateContent(m_page);

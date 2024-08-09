@@ -46,4 +46,6 @@ public:
 	afx_msg void OnBnClickedBtnNextPage();
 	CButton m_chkTransparencyCanvas;
 	afx_msg void OnBnClickedChkTransparencyCanvas();
+	CButton m_chkDoubleBuffer;
+	afx_msg void OnBnClickedChkDoublebuffer();
 };

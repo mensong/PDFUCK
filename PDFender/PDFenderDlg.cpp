@@ -51,6 +51,7 @@ void CPDFenderDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RENDER, m_renderStatic);
 	DDX_Control(pDX, IDC_CMB_PAGES, m_cmbPageIndexs);
 	DDX_Control(pDX, IDC_CHK_Transparency_CANVAS, m_chkTransparencyCanvas);
+	DDX_Control(pDX, IDC_CHK_DOUBLEBUFFER, m_chkDoubleBuffer);
 }
 
 BEGIN_MESSAGE_MAP(CPDFenderDlg, CDialogEx)
@@ -61,6 +62,7 @@ BEGIN_MESSAGE_MAP(CPDFenderDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_PRE_PAGE, &CPDFenderDlg::OnBnClickedBtnPrePage)
 	ON_BN_CLICKED(IDC_BTN_NEXT_PAGE, &CPDFenderDlg::OnBnClickedBtnNextPage)
 	ON_BN_CLICKED(IDC_CHK_Transparency_CANVAS, &CPDFenderDlg::OnBnClickedChkTransparencyCanvas)
+	ON_BN_CLICKED(IDC_CHK_DOUBLEBUFFER, &CPDFenderDlg::OnBnClickedChkDoublebuffer)
 END_MESSAGE_MAP()
 
 
@@ -82,6 +84,7 @@ BOOL CPDFenderDlg::OnInitDialog()
 	m_scale.AddExclude(GetDlgItem(IDC_BTN_PRE_PAGE)->m_hWnd);
 	m_scale.AddExclude(GetDlgItem(IDC_BTN_NEXT_PAGE)->m_hWnd);
 	m_scale.AddExclude(m_chkTransparencyCanvas.m_hWnd);
+	m_scale.AddExclude(m_chkDoubleBuffer.m_hWnd);
 	m_scale.SetAnchor(m_renderStatic.m_hWnd, 
 		CCtrlScale::AnchorLeftToWinLeft |
 		CCtrlScale::AnchorRightToWinRight |
@@ -90,6 +93,8 @@ BOOL CPDFenderDlg::OnInitDialog()
 	);
 	m_scale.Init(m_hWnd);
 
+	m_chkDoubleBuffer.SetCheck(BST_CHECKED);
+	
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -207,5 +212,13 @@ void CPDFenderDlg::OnBnClickedChkTransparencyCanvas()
 {
 	m_renderStatic.SetDrawPageBackgroup(
 		m_chkTransparencyCanvas.GetCheck() != BST_CHECKED);
+	m_renderStatic.Invalidate();
+}
+
+
+void CPDFenderDlg::OnBnClickedChkDoublebuffer()
+{
+	m_renderStatic.SetEnableDoubleBuffer(
+		m_chkDoubleBuffer.GetCheck() == BST_CHECKED);
 	m_renderStatic.Invalidate();
 }

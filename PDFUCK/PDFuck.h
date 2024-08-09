@@ -565,7 +565,16 @@ public:
 		int size_x_inDC,
 		int size_y_inDC,
 		PAGE_RATEION rotate_inDC,
-		int/*RENDER_FLAGS*/ flags) = 0;
+		int/*RENDER_FLAGS*/ flags = 0) = 0;
+	virtual void RenderToDC_DoubleBuffer(
+		HDC dc,
+		int x_inDC,
+		int y_inDC,
+		int size_x_inDC,
+		int size_y_inDC,
+		PAGE_RATEION rotate_inDC,
+		COLORREF colorTransparent,
+		int/*RENDER_FLAGS*/ flags = 0) = 0;
 
 	virtual void RenderToBitmap(
 		PDF_BITMAP* bitmap,
@@ -574,7 +583,7 @@ public:
 		int size_x_inBitmap,
 		int size_y_inBitmap,
 		PAGE_RATEION rotate_inBitmap,
-		int/*RENDER_FLAGS*/ flags) = 0;
+		int/*RENDER_FLAGS*/ flags = 0) = 0;
 
 	//_LT0 - LEFT TOP base coordinate
 	virtual void RenderToBitmapEx(
@@ -584,7 +593,7 @@ public:
 		float e, float f,
 		float left_inBitmap, float top_inBitmap,
 		float right_inBitmap, float bottom_inBitmap,
-		int/*RENDER_FLAGS*/ flags) = 0;
+		int/*RENDER_FLAGS*/ flags = 0) = 0;
 
 };
 

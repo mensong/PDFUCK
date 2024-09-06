@@ -437,6 +437,7 @@ public:
 
 	virtual int GetCharIndexFromTextIndex(int nTextIndex) = 0;
 	virtual int GetTextIndexFromCharIndex(int nCharIndex) = 0;
+	//return resultBuff的大小
 	virtual int GetText(int start_index, int count, wchar_t* resultBuff) = 0;
 
 	virtual int CountRects(int start_index = 0, int count = 0) = 0;
@@ -658,6 +659,7 @@ public:
 	virtual const PDF_FONT* GetDefaultFont() = 0;
 };
 
+//失败则返回NULL
 PDF_API PDF_DOCUMENT* CreateDocument();
 PDF_API PDF_DOCUMENT* LoadDocumentFromFile(const char* file_path, const char* password);
 PDF_API PDF_DOCUMENT* LoadDocumentFromMemory(const void* data_buf, size_t size, const char* password);

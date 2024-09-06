@@ -791,10 +791,10 @@ int main(int argc, char** argv)
 	//}
 	//return 0;
 
-	float cd = ColourDistance(255, 255, 255, 0, 0, 0);
-	cd = ColourDistance(254, 101, 0, 255, 100, 0);
-	cd = ColourDistance(255, 0, 0, 253, 0, 0);
-	cd = ColourDistance(255, 0, 0, 0, 255, 0);
+	//float cd = ColourDistance(255, 255, 255, 0, 0, 0);
+	//cd = ColourDistance(254, 101, 0, 255, 100, 0);
+	//cd = ColourDistance(255, 0, 0, 253, 0, 0);
+	//cd = ColourDistance(255, 0, 0, 0, 255, 0);
 
 	auto funcUsage = []()
 	{

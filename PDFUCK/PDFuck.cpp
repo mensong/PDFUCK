@@ -47,12 +47,16 @@ bool __GlobalInitializeLibrary::g_Initialized = false;
 PDF_API PDF_DOCUMENT* CreateDocument()
 {
 	FPDF_DOCUMENT doc = FPDF_CreateNewDocument();
+	if (!doc)
+		return NULL;
 	return new PDF_DOCUMENT_imp(doc);
 }
 
 PDF_API PDF_DOCUMENT* LoadDocumentFromFile(const char* file_path, const char* password)
 {
 	FPDF_DOCUMENT doc = FPDF_LoadDocument(file_path, password);
+	if (!doc)
+		return NULL;
 	return new PDF_DOCUMENT_imp(doc);
 
 }
@@ -60,11 +64,15 @@ PDF_API PDF_DOCUMENT* LoadDocumentFromFile(const char* file_path, const char* pa
 PDF_API PDF_DOCUMENT* LoadDocumentFromMemory(const void* data_buf, size_t size, const char* password)
 {
 	FPDF_DOCUMENT doc = FPDF_LoadMemDocument64(data_buf, size, password);
+	if (!doc)
+		return NULL;
 	return new PDF_DOCUMENT_imp(doc);
 }
 
 PDF_API void CloseDocument(PDF_DOCUMENT** doc)
 {
+	if (!doc || !(*doc))
+		return;
 	PDF_DOCUMENT_imp* p = dynamic_cast<PDF_DOCUMENT_imp*>(*doc);
 	delete p;
 	*doc = NULL;

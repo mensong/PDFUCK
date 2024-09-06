@@ -12,3 +12,8 @@
 /Run/right.pdf
 /Run/left.pdf
 /Pdf2Text/x64
+/Pdf2Image/x64
+/Pdf2Image/Win32
+/Pdf2Text/Win32
+/ComparePdf/Win32
+/PDFender/Win32

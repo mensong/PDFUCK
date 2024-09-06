@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>"-pdf=C:\Program Files\TechSmith\Snagit 2020\de-DE\TechSmith Snagit EULA.pdf" -txt=d:\1.txt</LocalDebuggerCommandArguments>
-    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>"-pdf=D:\hoops\HOOPS_Exchange_Publish_2022_SP2_U2_Win_VS2015\HOOPS Exchange入门手册.pdf" -img=E:\working\1.jpg</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

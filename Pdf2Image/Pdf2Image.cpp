@@ -1,5 +1,6 @@
 ﻿
 #include <iostream>
+#include <set>
 #include "../PDFUCK/PDFuck.h"
 #include "../pystring/pystring.h"
 
@@ -10,11 +11,13 @@ int main(int argc, char** argv)
 		std::cout << "Usage:"
 			<< " -pdf=pdf file"
 			<< " -img=page image file"
+			<< " -page=1,3-10"
 			<< std::endl;
 	};
 
 	std::string pdfFile;
 	std::string imgFile;
+	std::set<int> pages;
 
 	auto funcSplitArg = [](const std::string& arg, std::string& key, std::string& val)->void
 	{
@@ -50,6 +53,39 @@ int main(int argc, char** argv)
 			pdfFile = val;
 		else if (pystring::equal(key, "img", true))
 			imgFile = val;
+		else if (pystring::equal(key, "page", true))
+		{
+			std::vector<std::string> sp;
+			pystring::split(val, sp, ",");
+			for (size_t i = 0; i < sp.size(); i++)
+			{
+				std::string s = pystring::strip(sp[i]);
+				if (pystring::iscempty(s))
+					continue;
+				size_t idxG = s.find('-');
+				if (idxG != std::string::npos)
+				{
+					std::string startPage = s.substr(0, idxG);
+					std::string endPage = s.substr(idxG + 1);
+					int start = atoi(startPage.c_str());
+					int end = atoi(endPage.c_str());
+					if (start == 0 || end == 0)
+						continue;
+					for (int p = start; p <= end; p++)
+					{
+						pages.insert(p);
+					}
+				}
+				else
+				{
+					int pageIdx = atoi(s.c_str());
+					if (pageIdx == 0)
+						continue;
+					pages.insert(pageIdx);
+				}
+
+			}
+		}
 	}
 
 	if (pystring::iscempty(pdfFile) || pystring::iscempty(imgFile))
@@ -72,9 +108,12 @@ int main(int argc, char** argv)
 	int countPages = pdf->CountPages();
 	for (int i = 0; i < countPages; i++)
 	{
+		if (pages.size() != 0 && pages.find(i + 1) == pages.end())
+			continue;
+
 		std::string outFile = os_path::join(outDir, outFileName);
 		if (i != 0)
-			outFile += "-" + std::to_string(i);
+			outFile += "-" + std::to_string(i + 1);
 		outFile += "." + outFileExt;
 
 		PDF_PAGE* page = pdf->OpenPage(i);

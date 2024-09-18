@@ -341,6 +341,7 @@ static int _write_jpg_core(stbi__write_context* s, int width, int height, int co
 		int DCY = 0, DCU = 0, DCV = 0;
 		int bitBuf = 0, bitCnt = 0;
 		// comp == 2 is grey+alpha (alpha is ignored)
+		//mensong:Pdfium中RB对应stb中的BR，所以这里需要反转RB
 		int ofsG = comp > 2 ? 1 : 0, ofsR = comp > 2 ? 2 : 0;//mensong
 		const unsigned char* dataB = (const unsigned char*)data;//mensong
 		const unsigned char* dataG = dataB + ofsG;//mensong

@@ -573,7 +573,11 @@ void CompareLeftRight(const std::string& pdf1, const std::string& pdf2,
 	const std::string& leftPdf, const std::string& rightPdf, int compareType)
 {
     auto doc1 = PDFuck::Ins().LoadDocumentFromFile(pdf1.c_str(), NULL);
+	if (!doc1)
+		return;
     auto doc2 = PDFuck::Ins().LoadDocumentFromFile(pdf2.c_str(), NULL);
+	if (!doc2)
+		return;
 
     int pagesCount = min(doc1->CountPages(), doc2->CountPages());
     for (int i = 0; i < pagesCount; i++)
@@ -626,8 +630,14 @@ float ColourDistance(uint8_t R1, uint8_t G1, uint8_t B1, uint8_t R2, uint8_t G2,
 void CompareOverride(const std::string& pdf1, const std::string& pdf2, const std::string& mergePdf, int compareType = 0)
 {
 	auto doc1 = PDFuck::Ins().LoadDocumentFromFile(pdf1.c_str(), NULL);
+	if (!doc1)
+		return;
 	auto doc2 = PDFuck::Ins().LoadDocumentFromFile(pdf2.c_str(), NULL);
+	if (!doc2)
+		return;
 	auto docMerge = PDFuck::Ins().CreateDocument();
+	if (!docMerge)
+		return;
 
 	docMerge->SetDefaultFontFilePath("simfang.ttf");
 

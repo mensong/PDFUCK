@@ -61,10 +61,19 @@ int main(int argc, char** argv)
 	}
 
 	auto outPdf = PDFuck::Ins().CreateDocument();
+	if (!outPdf)
+	{
+		std::cout << "创建目标pdf失败" << std::endl;
+		return 1;
+	}
 	for (size_t i = 0; i < inPdfFiles.size(); i++)
 	{
 		auto inPdf = PDFuck::Ins().LoadDocumentFromFile(inPdfFiles[i].c_str(), NULL);
-
+		if (!inPdf)
+		{
+			std::cout << inPdfFiles[i] << " 打开失败，将跳过" << std::endl;
+			continue;
+		}
 		outPdf->ImportPagesFrom(inPdf, NULL, outPdf->CountPages());
 
 		PDFuck::Ins().CloseDocument(&inPdf);

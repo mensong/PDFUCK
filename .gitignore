@@ -18,3 +18,5 @@
 /ComparePdf/Win32
 /PDFender/Win32
 /PdfMerge/x64
+/ExtractImagesFromPdf/Win32
+/ExtractImagesFromPdf/x64

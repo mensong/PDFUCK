@@ -134,12 +134,17 @@ int main(int argc, char** argv)
 		auto textPage = page->OpenTextPage();
 		if (textPage)
 		{
-			int writed =textPage->GetText(0, 4096, text);
-			if (writed <= 4096)
+			int writed = 0;
+			int totalWrited = 0;
+			do
 			{
-				text[writed] = '\0';
-				resText += UnicodeToAnsi(text);
-			}
+				writed = textPage->GetText(totalWrited, 4096, text);
+				if (writed > 0)
+				{
+					resText += UnicodeToAnsi(text);
+					totalWrited += writed;
+				}
+			} while (writed > 0);
 			page->CloseTextPage(&textPage);
 		}
 		pdf->ClosePage(&page);

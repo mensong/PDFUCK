@@ -437,7 +437,7 @@ public:
 
 	virtual int GetCharIndexFromTextIndex(int nTextIndex) = 0;
 	virtual int GetTextIndexFromCharIndex(int nCharIndex) = 0;
-	//return resultBuff的大小
+	//return result buff的大小，失败返回-1
 	virtual int GetText(int start_index, int count, wchar_t* resultBuff) = 0;
 
 	virtual int CountRects(int start_index = 0, int count = 0) = 0;

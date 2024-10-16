@@ -121,7 +121,8 @@ bool PDF_TEXTPAGE_imp::GetCharOrigin(int index, float* x, float* y)
 
 int PDF_TEXTPAGE_imp::GetText(int start_index, int count, wchar_t* resultBuff)
 {
-	return FPDFText_GetText(m_textPage, start_index, count, (unsigned short*)resultBuff);
+	int bufSize = FPDFText_GetText(m_textPage, start_index, count, (unsigned short*)resultBuff);
+	return bufSize - 1;
 }
 
 int PDF_TEXTPAGE_imp::CountRects(int start_index/* = 0*/, int count/* = 0*/)

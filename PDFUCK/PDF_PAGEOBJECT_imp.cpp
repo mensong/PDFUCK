@@ -181,19 +181,25 @@ bool PDF_PAGEOBJECT_imp::Image_SetBitmap(PDF_BITMAP* bitmap)
 {
 	return FPDFImageObj_SetBitmap(NULL, 0, m_obj, IMP(PDF_BITMAP, bitmap)->m_bitmap);
 }
-PDF_BITMAP* PDF_PAGEOBJECT_imp::Image_GetBitmap()
+PDF_BITMAP* PDF_PAGEOBJECT_imp::Image_OpenBitmap()
 {
 	auto o = FPDFImageObj_GetBitmap(m_obj);
 	if (!o)
 		return NULL;
 	return new PDF_BITMAP_imp(o);
 }
-PDF_BITMAP* PDF_PAGEOBJECT_imp::Image_GetRenderedBitmap(PDF_DOCUMENT* doc, PDF_PAGE* page)
+PDF_BITMAP* PDF_PAGEOBJECT_imp::Image_OpenRenderedBitmap(PDF_DOCUMENT* doc, PDF_PAGE* page)
 {
 	auto o = FPDFImageObj_GetRenderedBitmap(IMP(PDF_DOCUMENT, doc)->m_doc, IMP(PDF_PAGE, page)->m_page, m_obj);
 	if (!o)
 		return NULL;
 	return new PDF_BITMAP_imp(o);
+}
+void PDF_PAGEOBJECT_imp::Image_CloseBitmap(PDF_BITMAP** pBitmap)
+{
+	auto o = IMP(PDF_BITMAP, *pBitmap);
+	delete o;
+	*pBitmap = NULL;
 }
 unsigned long PDF_PAGEOBJECT_imp::Image_GetDataDecoded(void* buffer, unsigned long buflen)
 {
@@ -503,7 +509,7 @@ PDF_PAGEOBJECT* PDF_PAGEOBJECT_imp::Clone(PDF_DOCUMENT* doc, PDF_PAGE* page)
 		{
 			funcFillCommon();
 
-			auto bitmap = this->Image_GetBitmap();
+			auto bitmap = this->Image_OpenBitmap();
 			if (bitmap)
 				newPageObj->Image_SetBitmap(bitmap);
 		}

@@ -86,16 +86,17 @@ int main(int argc, char** argv)
 			auto obj = page->OpenPageObject(j);
 			if (!obj)
 				continue;
+
 			if (obj->GetType() == PDF_PAGEOBJ_IMAGE)
 			{
 				++imageIdx;
-				auto bmp = obj->Image_GetBitmap();
+				auto bmp = obj->Image_OpenBitmap();
 				if (bmp)
 				{
 					std::string outFileName = std::to_string(i + 1) + "-" + std::to_string(imageIdx) + "." + out_image_ext;
 					outFileName = os_path::join(outDir, outFileName);
 					bmp->WriteToFile(outFileName.c_str());
-					doc->CloseBitmap(&bmp);
+					obj->Image_CloseBitmap(&bmp);
 				}
 			}
 			page->ClosePageObject(&obj);

@@ -60,9 +60,11 @@ public:
 
 	virtual bool Image_SetBitmap(PDF_BITMAP* bitmap) override;
 
-	virtual PDF_BITMAP* Image_GetBitmap() override;
+	virtual PDF_BITMAP* Image_OpenBitmap() override;
 
-	virtual PDF_BITMAP* Image_GetRenderedBitmap(PDF_DOCUMENT* doc, PDF_PAGE* page) override;
+	virtual PDF_BITMAP* Image_OpenRenderedBitmap(PDF_DOCUMENT* doc, PDF_PAGE* page) override;
+
+	virtual void Image_CloseBitmap(PDF_BITMAP** pBitmap) override;
 
 	virtual unsigned long Image_GetDataDecoded(void* buffer, unsigned long buflen) override;
 

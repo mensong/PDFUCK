@@ -310,8 +310,9 @@ public:
 	virtual bool SetLineCap(PDF_LINECAP line_cap) = 0;
 
 	virtual bool Image_SetBitmap(PDF_BITMAP* bitmap) = 0;
-	virtual PDF_BITMAP* Image_GetBitmap() = 0;//使用PDF_DOCUMENT::CloseBitmap进行析构
-	virtual PDF_BITMAP* Image_GetRenderedBitmap(PDF_DOCUMENT* doc, PDF_PAGE* page) = 0;
+	virtual PDF_BITMAP* Image_OpenBitmap() = 0;//获得原始的图片，忽略几何变换
+	virtual PDF_BITMAP* Image_OpenRenderedBitmap(PDF_DOCUMENT* doc, PDF_PAGE* page) = 0;//获得最终渲染后的图片
+	virtual void Image_CloseBitmap(PDF_BITMAP** pBitmap) = 0;
 	virtual unsigned long Image_GetDataDecoded(void* buffer,	unsigned long buflen) = 0;
 	virtual unsigned long Image_GetDataRaw(void* buffer, unsigned long buflen) = 0;
 	virtual int Image_GetFilterCount() = 0;

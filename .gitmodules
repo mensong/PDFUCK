@@ -7,3 +7,6 @@
 [submodule "pystring"]
 	path = pystring
 	url = https://github.com/mensong/pystring.git
+[submodule "jsoncppx"]
+	path = jsoncppx
+	url = https://github.com/mensong/jsoncppx.git

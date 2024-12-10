@@ -2,6 +2,7 @@
 #include <fstream>
 #include "../PDFUCK/PDFuck.h"
 #include "../pystring/pystring.h"
+#include "../jsoncppx/include/json/json.h"
 
 std::string UnicodeToAnsi(const std::wstring& Unicode)
 {
@@ -66,12 +67,12 @@ int main(int argc, char** argv)
 	{
 		std::cout << "Usage:"
 			<< " -pdf=pdf file"
-			<< " -txt=txt file[no set will print]"
+			<< " -out=json file[no set will print]"
 			<< std::endl;
 	};
 
 	std::string pdfFile;
-	std::string txtFile;
+	std::string outFile;
 
 	auto funcSplitArg = [](const std::string& arg, std::string& key, std::string& val)->void
 	{
@@ -105,15 +106,15 @@ int main(int argc, char** argv)
 
 		if (pystring::equal(key, "pdf", true))
 			pdfFile = val;
-		else if (pystring::equal(key, "txt", true))
-			txtFile = val;
+		else if (pystring::equal(key, "out", true))
+			outFile = val;
 	}
 
 	if (pystring::iscempty(pdfFile))
-    {
+	{
 		funcUsage();
-        return 1;
-    }
+		return 1;
+	}
 
 	auto pdf = PDFuck::Ins().LoadDocumentFromFile(pdfFile.c_str(), NULL);
 	if (!pdf)
@@ -122,8 +123,8 @@ int main(int argc, char** argv)
 		return 2;
 	}
 
+	Json::Value jArrText;
 
-	std::string resText;
 	int countPages = pdf->CountPages();
 #define BUFF_SIZE 10240
 	wchar_t text[BUFF_SIZE + 1];
@@ -137,6 +138,7 @@ int main(int argc, char** argv)
 		{
 			int writed = 0;
 			int totalWrited = 0;
+			std::string resText;
 			do
 			{
 				writed = textPage->GetText(totalWrited, BUFF_SIZE, text);
@@ -147,26 +149,24 @@ int main(int argc, char** argv)
 				}
 			} while (writed > 0);
 			page->CloseTextPage(&textPage);
+
+			Json::Value jTextObj;
+			jTextObj["page_idx"] = i;
+			jTextObj["text"] = resText;
+			jArrText.append(jTextObj);
 		}
 		pdf->ClosePage(&page);
-
-		resText += "\n";
 	}
 	PDFuck::Ins().CloseDocument(&pdf);
 
-	if (pystring::iscempty(txtFile))
+	if (pystring::iscempty(outFile))
 	{
-		std::cout << resText;
+		std::cout << Json::FastWriter().write(jArrText);
 	}
 	else
 	{
-		std::ofstream outFile(txtFile);
-		if (outFile.is_open()) 
-		{
-			outFile << resText;
-			outFile.close();
-		}
+		Json::FastWriter().writeFile(jArrText, outFile);
 	}
 
-    return 0;
+	return 0;
 }

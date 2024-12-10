@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 				auto bmp = obj->Image_OpenBitmap();
 				if (bmp)
 				{
-					std::string outFileName = std::to_string(i + 1) + "-" + std::to_string(imageIdx) + "." + out_image_ext;
+					std::string outFileName = std::to_string(i) + "-" + std::to_string(imageIdx) + "." + out_image_ext;
 					outFileName = os_path::join(outDir, outFileName);
 					bmp->WriteToFile(outFileName.c_str());
 					obj->Image_CloseBitmap(&bmp);

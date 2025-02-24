@@ -73,9 +73,9 @@ int main(int argc, char** argv)
 	}
 
 	int countPages = doc->CountPages();
-	for (int i = 0; i < countPages; i++)
+	for (int pageIdx = 0; pageIdx < countPages; pageIdx++)
 	{
-		auto page = doc->OpenPage(i);
+		auto page = doc->OpenPage(pageIdx);
 		if (!page)
 			continue;
 
@@ -89,11 +89,10 @@ int main(int argc, char** argv)
 
 			if (obj->GetType() == PDF_PAGEOBJ_IMAGE)
 			{
-				++imageIdx;
 				auto bmp = obj->Image_OpenBitmap();
 				if (bmp)
 				{
-					std::string outFileName = std::to_string(i) + "-" + std::to_string(imageIdx) + "." + out_image_ext;
+					std::string outFileName = std::to_string(pageIdx) + "-" + std::to_string(imageIdx++) + "." + out_image_ext;
 					outFileName = os_path::join(outDir, outFileName);
 					bmp->WriteToFile(outFileName.c_str());
 					obj->Image_CloseBitmap(&bmp);
